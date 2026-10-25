@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * Kothar Trace API v6.0 SUPREMO (ALINHADO + TURBINADO)
  *
@@ -99,7 +100,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...(options.headers as Record<string, string>),
   };
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await apiFetch(`${API_BASE}${path}`, { ...options, headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
     throw new Error(err.error || `HTTP ${res.status}`);
@@ -107,11 +108,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return res.json();
 }
 
-export async function login(): Promise<{ token: string; expiresAt: string }> {
-  return { token: "kothar-v4-local", expiresAt: "2099-01-01T00:00:00Z" };
-}
+export { verificarSessao as login, encerrarSessao as logout } from '../../seguranca/sessao';
 
-export function logout() {}
 
 export async function listSessions(): Promise<ApiSession[]> {
   const data: any[] = await request('/sessions/');
@@ -177,7 +175,23 @@ export async function clearSessionTraces(id: string): Promise<{ success: boolean
 // SISTEMA DE MARCAÇÃO DE ERROS (REPORTAR FALSO POSITIVO)
 // =========================================================
 
-const MARKED_ERRORS_KEY = 'kothar:marked_errors';
+let markedErrorsCache: MarkedError[] = [];
+
+export async function loadMarkedErrors(): Promise<MarkedError[]> {
+  const response = await apiFetch(`${API_BASE}/workspace-state/marked_error`);
+  if (!response.ok) throw new Error('Não foi possível carregar os erros marcados');
+  const rows = await response.json();
+  markedErrorsCache = rows.map((row: { payload: MarkedError }) => row.payload);
+  return markedErrorsCache;
+}
+
+async function persistMarkedError(error: MarkedError): Promise<void> {
+  const response = await apiFetch(`${API_BASE}/workspace-state/marked_error/${encodeURIComponent(error.id)}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: error.id, payload: error }),
+  });
+  if (!response.ok) throw new Error('Não foi possível persistir o erro marcado');
+}
 
 /**
  * Marca um trace como erro que o usuário identificou.
@@ -212,12 +226,10 @@ export function markTraceAsError(
     resolved: false,
   };
 
-  // Salva no localStorage (cliente) e envia para backend
-  const all = getMarkedErrors();
-  all.push(error);
-  localStorage.setItem(MARKED_ERRORS_KEY, JSON.stringify(all));
+  markedErrorsCache = [...markedErrorsCache.filter((item) => item.id !== error.id), error];
 
-  // Envia para o backend (assíncrono, não bloqueia UI)
+  // PostgreSQL é a autoridade; o cache acima serve apenas à renderização atual.
+  persistMarkedError(error).catch(() => {});
   syncErrorToBackend(error).catch(() => {});
 
   return error;
@@ -227,13 +239,7 @@ export function markTraceAsError(
  * Lista todos os erros marcados pelo usuário
  */
 export function getMarkedErrors(sessionId?: string): MarkedError[] {
-  try {
-    const raw = localStorage.getItem(MARKED_ERRORS_KEY);
-    const all: MarkedError[] = raw ? JSON.parse(raw) : [];
-    return sessionId ? all.filter(e => e.session_id === sessionId) : all;
-  } catch {
-    return [];
-  }
+  return sessionId ? markedErrorsCache.filter(e => e.session_id === sessionId) : [...markedErrorsCache];
 }
 
 /**
@@ -261,7 +267,7 @@ async function syncErrorToBackend(error: MarkedError): Promise<void> {
     await request('/inspector/chromadb/collections').catch(() => null);
 
     // Salva como lock no Neo4j/PostgreSQL via endpoint dedicado
-    await fetch(`${API_BASE}/locks/create`, {
+    await apiFetch(`${API_BASE}/locks/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -277,9 +283,7 @@ async function syncErrorToBackend(error: MarkedError): Promise<void> {
         marked_at: error.marked_at,
       }),
     }).catch(() => null);
-  } catch {
-    // Silencioso - o erro fica salvo no localStorage
-  }
+  } catch {}
 }
 
 // =========================================================

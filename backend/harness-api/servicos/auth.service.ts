@@ -1,35 +1,16 @@
 /**
  * Auth Service — geração e validação de tokens
  */
-import { gerarToken, verificarToken, JWTPayload } from '../utilitarios/jwt.util';
+import { sessions, AuthSession } from '../utilitarios/session-store';
 
-export interface LoginResult {
-  token: string;
-  expiresAt: string;
-  username: string;
+export interface LoginResult { token: string; session: AuthSession }
+export async function login(username: unknown, password: unknown, ip: string): Promise<LoginResult> {
+  return sessions().create(username, password, ip);
 }
-
-export function login(username?: string, password?: string): LoginResult {
-  if (!username || !password) {
-    throw new Error('Usuário e senha são obrigatórios');
-  }
-
-  const adminUsername = process.env.ADMIN_USERNAME || 'kothar_admin';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'kothar_secure_2026';
-
-  if (username !== adminUsername || password !== adminPassword) {
-    throw new Error('Credenciais inválidas');
-  }
-
-  const { token, expiresAt } = gerarToken(username);
-  return { token, expiresAt, username };
+export async function refresh(token: string): Promise<AuthSession | null> {
+  // Absolute expiry is preserved; refreshing metadata never extends a stolen session.
+  return sessions().read(token);
 }
-
-export function refresh(username: string): LoginResult {
-  const { token, expiresAt } = gerarToken(username);
-  return { token, expiresAt, username };
-}
-
-export function validarToken(token: string): JWTPayload | null {
-  return verificarToken(token);
+export async function validarToken(token: string): Promise<AuthSession | null> {
+  return sessions().read(token);
 }

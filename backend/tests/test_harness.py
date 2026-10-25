@@ -6,7 +6,10 @@
 """
 
 import asyncio
+import os
 import sys
+
+import pytest
 
 from backend.core.logger import get_logger, setup_logging
 
@@ -146,6 +149,8 @@ async def test_blueprint_executor():
 
 async def test_orchestrator_integration():
     """Testa integração com orchestrator (requer DB/Redis)."""
+    if os.environ.get("RUN_INTEGRATION_TESTS") != "1":
+        pytest.skip("requer serviços reais; execute com RUN_INTEGRATION_TESTS=1")
     try:
         from backend.engenheiro_kothar import engenheiro_kothar
 

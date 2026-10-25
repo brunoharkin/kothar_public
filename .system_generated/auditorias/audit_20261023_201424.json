@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-23T20:14:24.358491",
+  "files_audited": 7,
+  "violations": [
+    {
+      "file": "/home/bruno-harkin/kothar/ferramentas/leitor-voz-ptbr/instalar-servico.sh",
+      "line": 23,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "critical": 0,
+    "high": 1
+  }
+}

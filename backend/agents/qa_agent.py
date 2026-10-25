@@ -7,8 +7,12 @@
  Não confia no resultado até que passe pelo portão de QA.
 """
 
-import asyncio
+import ast
+import json
 import subprocess
+import sys
+import tomllib
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
@@ -45,6 +49,12 @@ class QAAgent(BaseAgent):
         checks_passed = []
         checks_failed = []
 
+        # Necessidade funcional vem da rota do servidor, nunca da extensão do arquivo.
+        if task.get("requires_frontend_verification"):
+            checks_failed.append("Verificador funcional de frontend não configurado; aceite bloqueado.")
+        if task.get("requires_auth_verification"):
+            checks_failed.append("Verificador funcional de autenticação não configurado; aceite bloqueado.")
+
         log.info("QA iniciando validação", files_count=len(files))
 
         # 1. Verificação de sintaxe Python
@@ -63,6 +73,21 @@ class QAAgent(BaseAgent):
                 checks_failed.append(f"Arquivos ausentes: {missing}")
             else:
                 checks_passed.append("arquivos_esperados")
+
+        if task.get("strict_artifact_checks"):
+            for filepath in files:
+                suffix = Path(filepath).suffix
+                if suffix == ".py":
+                    continue  # Já verificado acima, sem executar código do projeto.
+                parser = {".json": json.loads, ".toml": tomllib.loads}.get(suffix)
+                if parser is None:
+                    checks_failed.append(f"Verificador para {suffix} não configurado; aceite funcional pendente.")
+                    continue
+                try:
+                    parser(Path(filepath).read_text(encoding="utf-8"))
+                    checks_passed.append(f"sintaxe_{suffix[1:]}")
+                except (OSError, ValueError):
+                    checks_failed.append(f"Arquivo {suffix} inválido ou indisponível.")
 
         # 3. Verifica debug prints
         debug_issues = self._check_debug_code(files)
@@ -112,20 +137,17 @@ class QAAgent(BaseAgent):
             "checks_passed": checks_passed,
             "checks_failed": checks_failed,
             "report": report,
+            "scope": "artifact_checks_only",
+            "production_ready": False,
         }
 
     def _check_python_syntax(self, files: list[str]) -> dict:
         errors = []
         for filepath in files:
             try:
-                result = subprocess.run(
-                    ["python", "-m", "py_compile", filepath],
-                    capture_output=True, text=True, timeout=10
-                )
-                if result.returncode != 0:
-                    errors.append(f"Sintaxe inválida: {filepath} — {result.stderr[:200]}")
-            except Exception as e:
-                errors.append(f"Falha ao verificar {filepath}: {e}")
+                ast.parse(Path(filepath).read_text(encoding="utf-8"), filename=filepath)
+            except (OSError, SyntaxError, ValueError):
+                errors.append("Sintaxe Python inválida ou arquivo indisponível.")
         return {"passed": len(errors) == 0, "errors": errors}
 
     def _check_debug_code(self, files: list[str]) -> list[str]:
@@ -147,7 +169,7 @@ class QAAgent(BaseAgent):
     def _run_tests(self, test_dir: str) -> dict:
         try:
             result = subprocess.run(
-                ["python", "-m", "pytest", test_dir, "--tb=short", "-q"],
+                [sys.executable, "-m", "pytest", test_dir, "--tb=short", "-q"],
                 capture_output=True, text=True, timeout=120
             )
             passed = result.returncode == 0
@@ -155,10 +177,8 @@ class QAAgent(BaseAgent):
             count = 0
             for line in result.stdout.splitlines():
                 if " passed" in line:
-                    try:
+                    with suppress(ValueError):
                         count = int(line.strip().split()[0])
-                    except ValueError:
-                        pass
             return {"passed": passed, "count": count, "output": result.stdout + result.stderr}
         except Exception as e:
             return {"passed": False, "count": 0, "output": str(e)}

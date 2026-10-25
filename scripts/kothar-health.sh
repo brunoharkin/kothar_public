@@ -361,7 +361,7 @@ run_health_check() {
     # Verificar credenciais expostas
     CRED_COUNT=$(grep -rE "(password|secret|token|api[_-]?key)\s*=\s*['\"][^'\"]{8,}" "$KOTHAR_DIR" \
         --exclude-dir=".git" --exclude-dir=".venv" --exclude-dir=".chroma-data" \
-        --exclude-dir="node_modules" --exclude-dir="infra" \
+        --exclude-dir="node_modules" --exclude-dir="infra" --exclude-dir="ambiente-voz" \
         --include="*.py" --include="*.js" --include="*.ts" 2>/dev/null \
         | grep -vE "\.git|/tests/|os\.getenv|os\.environ|process\.env|getenv\(|https?://" | wc -l)
     if [ "$CRED_COUNT" -eq 0 ]; then

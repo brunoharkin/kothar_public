@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable, Optional
 
+from backend.contracts.security import approved_result, security_coverage_approved
 from backend.core.logger import get_logger
 from backend.memory.cache.redis_client import RedisMemory
 from backend.memory.semantic.hyde_search import HyDESearch
@@ -59,6 +60,7 @@ class FlowResult:
     total_duration_ms: int = 0
     error: str = None
     checkpoint_recovered: bool = False
+    production_ready: bool = False
 
 
 class BlueprintExecutor:
@@ -102,7 +104,7 @@ class BlueprintExecutor:
         Args:
             session_id: ID da sessão
             task_handler: Função que executa cada passo (recebe step, session_id, context)
-                        Se None, usa execução simulada
+                        Se ausente, a execução fica bloqueada.
             task_context: Contexto adicional para os handlers
         """
         start_time = time.time()
@@ -118,6 +120,17 @@ class BlueprintExecutor:
                 failed_steps=0,
                 skipped_steps=0,
                 error="Blueprint não encontrado no Redis",
+            )
+
+        steps = blueprint.get("steps")
+        if (
+            not callable(task_handler) or not isinstance(steps, list) or not steps
+            or any(not isinstance(step, dict) for step in steps)
+        ):
+            return FlowResult(
+                session_id=session_id, status="blocked", total_steps=len(steps) if isinstance(steps, list) else 0,
+                completed_steps=0, failed_steps=0, skipped_steps=0,
+                error="Executor real e blueprint com passos são obrigatórios; simulação não é execução.",
             )
 
         # Recupera locks ativos
@@ -170,18 +183,13 @@ class BlueprintExecutor:
 
             step_results.append(step_result)
 
-            if step_result.status == "done":
-                completed_steps += 1
-                # Marca como concluído no validador
-                validator._completed_steps.add(step.get("title", ""))
-            elif step_result.status == "failed":
+            if step_result.status != "done":
                 failed_steps += 1
-                # Verifica se deve parar (circuit breaker)
-                if step_result.error and "Circuit Breaker" in step_result.error:
-                    log.error("Circuit breaker aberto, parando fluxo", session_id=session_id)
-                    break
-            else:
-                skipped_steps += 1
+                skipped_steps = len(steps) - len(step_results)
+                break
+
+            completed_steps += 1
+            validator._completed_steps.add(step.get("title", ""))
 
         total_duration = int((time.time() - start_time) * 1000)
 
@@ -401,6 +409,17 @@ class BlueprintExecutor:
                     timeout=timeout,
                 )
 
+                expected = "passed" if agent_name in {"security", "qa"} else "done"
+                approved = approved_result(result, expected)
+                if agent_name == "security":
+                    approved = security_coverage_approved(result)
+                if not approved:
+                    return StepResult(
+                        step_id=step_id, step_title=step_title, agent_name=agent_name,
+                        status="failed", output=result, error="Etapa não retornou aprovação verificável.",
+                        retries=attempt - 1,
+                    )
+
                 duration = int((time.time() - start) * 1000)
 
                 return StepResult(
@@ -463,19 +482,11 @@ class BlueprintExecutor:
         task_handler: Callable = None,
         task_context: dict = None,
     ) -> Any:
-        """Executa o handler do passo ou simula."""
+        """Executa somente um handler real fornecido pelo chamador interno."""
         if task_handler:
             return await task_handler(step, session_id, task_context or {})
 
-        # Simulação para testes
-        await asyncio.sleep(0.5)
-
-        return {
-            "simulated": True,
-            "step_id": step.get("id"),
-            "agent": agent_name,
-            "output": f"Resultado simulado do passo: {step.get('title', '')}",
-        }
+        raise RuntimeError("Executor real não configurado; nenhuma ação foi executada.")
 
     async def _load_locks(self, session_id: str) -> None:
         """Carrega locks ativos."""

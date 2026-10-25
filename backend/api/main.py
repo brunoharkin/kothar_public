@@ -6,6 +6,8 @@
 """
 
 from contextlib import asynccontextmanager
+import os
+from backend.api.security import APISecurityMiddleware
 
 import uvicorn
 from fastapi import FastAPI, Request, Response
@@ -18,15 +20,13 @@ from backend.core.exceptions import KotharError
 from backend.core.logger import get_logger, setup_logging
 
 # Importa routers
-from backend.api.routers import health, sessions, traces, skills, orchestrate, cbm, cofre, rag_tracker, vault_inspector, heatmaps, locks
+from backend.api.routers import health, sessions, traces, skills, orchestrate, cbm, cofre, rag_tracker, vault_inspector, heatmaps, locks, workspace_state
 from backend.api.routers.ollama_proxy import router as ollama_proxy_router
-from backend.api.routers.autenticacao_google import router as auth_google_router
-from backend.api.routers.autenticacao_linkedin import router as auth_linkedin_router
-from backend.api.routers.autenticacao_meta import router as auth_meta_router
 from backend.api.routers.model_preview import router as model_preview_router
 from backend.api.routers.dashboard import router as dashboard_router
 from backend.api.routers.cascade_metrics import router as cascade_metrics_router
 from backend.api.routers.flow import router as flow_router
+from backend.api.routers.evolucao import router as evolution_router
 from backend.trace.metrics import router as metrics_router
 from backend.trace.rag_metrics import router as rag_metrics_router
 
@@ -84,19 +84,13 @@ app = FastAPI(
 # --- CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8080",
-        "http://localhost:3030",
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3030",
-        "http://127.0.0.1:8080",
-    ],
+    allow_origins=[origin.strip() for origin in os.environ.get('CORS_ORIGIN', '').split(',') if origin.strip().startswith('https://')],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(APISecurityMiddleware)
 
 # --- Routers ---
 app.include_router(health.router,      prefix="/health",          tags=["Health"])
@@ -117,10 +111,9 @@ app.include_router(rag_tracker.router, prefix="/api/rag-tracker", tags=["RAG-Tra
 app.include_router(vault_inspector.router, prefix="/api/inspector", tags=["Vault-Inspector"])
 app.include_router(heatmaps.router,    prefix="/api/heatmaps",    tags=["Heatmaps"])
 app.include_router(flow_router,       prefix="/api/flow",         tags=["Flow"])
+app.include_router(workspace_state.router, prefix="/api/workspace-state", tags=["Workspace-State"])
+app.include_router(evolution_router, prefix="/api/evolucao", tags=["Evolução"])
 app.include_router(usage_router,      tags=["Token-Usage"])
-app.include_router(auth_google_router)
-app.include_router(auth_linkedin_router)
-app.include_router(auth_meta_router)
 
 # --- Métricas endpoint ---
 _metrics_store = MetricsStore()
@@ -237,7 +230,7 @@ async def kothar_error_handler(request: Request, exc: KotharError):
     status_code = getattr(exc, "http_status", 500)
     return JSONResponse(
         status_code=status_code,
-        content={"error": exc.message, "context": exc.context},
+        content={"error": "Não foi possível concluir a operação."},
     )
 
 

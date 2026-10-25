@@ -46,7 +46,7 @@ PROJECT_NAME=$(basename "$PWD")
 PROJECT_ROOT="$PWD"
 
 # Lista de projetos autorizados
-AUTHORIZED_PROJECTS=("chronodesk" "orby" "ugarit")
+AUTHORIZED_PROJECTS=("chronodesk" "orby" "ugarit" "farmacia" "agents-portfolio" "portfolio-agentes")
 
 if [[ ! " ${AUTHORIZED_PROJECTS[@]} " =~ " $PROJECT_NAME " ]]; then
     echo "❌ Projeto não autorizado: $PROJECT_NAME"

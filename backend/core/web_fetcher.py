@@ -33,8 +33,10 @@ def is_safe_url(url: str) -> bool:
     """Verifica se URL é segura para o agente acessar."""
     try:
         parsed = urlparse(url)
-        domain = parsed.netloc.lower()
-        return any(d in domain for d in SAFE_DOMAINS) or domain == "localhost"
+        if parsed.scheme != "https" or parsed.username or parsed.password:
+            return False
+        domain = (parsed.hostname or "").lower().rstrip(".")
+        return any(domain == allowed or domain.endswith("." + allowed) for allowed in SAFE_DOMAINS)
     except Exception:
         return False
 
@@ -133,8 +135,10 @@ async def _fetch_via_scrapling(url: str, timeout: int) -> Dict:
 
 async def _fetch_via_httpx(url: str, max_chars: int, timeout: int) -> Dict:
     """Fetch via httpx + extração de texto."""
-    async with httpx.AsyncClient(timeout=timeout, follow_redirects=True, headers=HEADERS) as client:
+    async with httpx.AsyncClient(timeout=timeout, follow_redirects=False, headers=HEADERS) as client:
         resp = await client.get(url)
+        if resp.is_redirect:
+            return {"ok": False, "error": "Redirecionamento externo bloqueado", "content": ""}
         resp.raise_for_status()
         html = resp.text
 

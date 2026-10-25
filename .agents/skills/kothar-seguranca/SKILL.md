@@ -23,6 +23,32 @@ description: >-
 
 ---
 
+## 🔴 Regras de Armazenamento de Sessão — PRODUÇÃO
+
+```
+❌ localStorage para token/sessão/auth → PARAR IMEDIATAMENTE
+❌ localStorage para contadores de segurança → PARAR IMEDIATAMENTE
+❌ sessionStorage para token/sessão/auth → PARAR IMEDIATAMENTE
+❌ Cookie sem HttpOnly para token → PARAR IMEDIATAMENTE
+✅ Sessão server-side (Redis/Postgres/Memcached) → OBRIGATÓRIO
+✅ Token em HttpOnly Cookie (Secure + SameSite=Strict) → OBRIGATÓRIO
+✅ Expiração real no servidor (não só no cookie) → OBRIGATÓRIO
+✅ Logout que invalida sessão no servidor → OBRIGATÓRIO
+```
+
+**localStorage é aceitável APENAS para:**
+- Preferências visuais (tema claro/escuro)
+- Idioma selecionado
+- Dados não sensíveis de UX (posição de sidebar, etc.)
+
+**localStorage é PROIBIDO para:**
+- Tokens de autenticação (JWT, session token)
+- Dados de sessão do usuário
+- Contadores de rate limiting ou tentativas
+- Qualquer dado que, se roubado via XSS, comprometa a conta
+
+---
+
 ## Padrões Detectáveis (escanear ao escrever)
 
 ```
@@ -30,6 +56,8 @@ CREDENCIAIS:   "sk-" | "ghp_" | "AKIA" | password = "valor"
 STORAGE:       localStorage.setItem com token
 LOGS:          console.log(...token...) | logger.info(...password...)
 SQL:           f"SELECT {var}" | .format() em queries
+SESSÃO:        localStorage.setItem('session' | 'token' | 'user' | 'auth')
+               sessionStorage.setItem com dados de auth
 ```
 
 ---
@@ -41,8 +69,7 @@ SQL:           f"SELECT {var}" | .format() em queries
 # ✅ CORRETO
 api_key = os.getenv('OPENAI_API_KEY')
 
-# ❌ PROIBIDO
-api_key = "sk-xxxx-xxxx"
+# Credencial literal no código é proibida; não incluir nem copiar valores em exemplos.
 ```
 
 ### Token — SEMPRE HttpOnly Cookie, NUNCA localStorage

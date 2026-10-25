@@ -1,0 +1,6 @@
+#!/home/bruno-harkin/kothar/ferramentas/ambiente-voz/bin/python3
+import sys
+from pocket_tts.main import cli_app
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(cli_app())

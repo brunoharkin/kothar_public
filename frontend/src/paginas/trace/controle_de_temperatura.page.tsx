@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { apiFetch } from '../../seguranca/sessao';
+import { useState, useEffect, useRef } from 'react';
 import { Flame, RefreshCw, Layers, Users, MousePointer2, Move } from 'lucide-react';
 import './trace.styles.css';
 
@@ -54,7 +55,7 @@ export function ControleDeTemperaturaPage() {
 
   const fetchSessions = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/heatmaps/sessions/${projectId}`);
+      const res = await apiFetch(`/api/heatmaps/sessions/${projectId}`);
       if (res.ok) {
         const data = await res.json();
         setSessions(data.sessions || []);
@@ -68,8 +69,8 @@ export function ControleDeTemperaturaPage() {
     setLoading(true);
     setError(null);
     try {
-      const url = `http://localhost:3000/api/heatmaps/data/${projectId}${selectedSession ? `?sessionId=${selectedSession}` : ''}`;
-      const res = await fetch(url);
+      const url = `/api/heatmaps/data/${projectId}${selectedSession ? `?sessionId=${selectedSession}` : ''}`;
+      const res = await apiFetch(url);
       if (!res.ok) throw new Error('Falha ao buscar dados');
       const data = await res.json();
       setPoints(data.points || []);
@@ -112,14 +113,13 @@ export function ControleDeTemperaturaPage() {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const maxY = points.length > 0 ? Math.max(...points.map(p => p.y)) : 0;
-  const containerHeight = iframeHeight ? iframeHeight : Math.max(3000, maxY + 1000);
   
   const clicksCount = points.filter(p => p.type === 'click').length;
   const movesCount = points.filter(p => p.type === 'move' || p.type === 'scroll').length;
 
   return (
-    <div className="trace-page-container">
+    <div className="trace-page-container" data-content-height={iframeHeight ?? undefined}>
+      {error && <p role="alert">{error}</p>}
       <header className="trace-header">
         <div className="trace-header-title">
           <Flame className="h-6 w-6 text-orange-500" />

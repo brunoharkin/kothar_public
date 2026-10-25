@@ -23,6 +23,9 @@ for file in "$REGISTRY" "$OWNERSHIP" "$TRANSITIONS"; do
 done
 
 python3 "$ROOT/scripts/validate-kothar-contracts.py"
+python3 "$ROOT/scripts/sincronizar-relatorio-entrega.py" --check
+python3 "$ROOT/scripts/verify-security-policy.py"
+python3 "$ROOT/scripts/sincronizar-politica-seguranca.py" --check
 python3 "$ROOT/scripts/kothar-agent-security-audit.py" "$ROOT" --json >/dev/null
 
 agent_count=0

@@ -1,28 +1,25 @@
 name: Deploy Kothar VPS
 
+# Temporary containment: do not restore deployment until the protected verifier,
+# artifact binding and production controls have independent evidence.
 on:
   push:
     branches:
       - master
       - main
+  workflow_dispatch:
+
+permissions: {}
 
 jobs:
-  deploy:
+  production-blocked:
+    name: Production promotion blocked
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
-        with:
-          host: 184.107.115.190
-          username: root
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            # Kothar Update
-            cd /opt/apps/kothar || (git clone git@github.com:agestrategia360-sudo/kothar.git /opt/apps/kothar && cd /opt/apps/kothar)
-            git fetch origin
-            git reset --hard origin/master
-            git clean -fd
-            
-            # Subir infra
-            docker compose build
-            docker compose up -d
+      - name: Refuse promotion without verified production controls
+        shell: bash
+        run: |
+          echo '::error::Deploy bloqueado: verificador independente, vinculação ao artefato e controles de produção ainda pendentes.'
+          echo 'Este workflow não acessa credenciais nem altera a VPS. Testes locais não autorizam promoção.'
+          exit 1

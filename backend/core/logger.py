@@ -15,6 +15,7 @@ from typing import Any
 import structlog
 
 from backend.core.config import settings
+from backend.core.privacy import redact_log
 
 
 def _add_kothar_context(
@@ -46,12 +47,14 @@ def setup_logging() -> None:
     if settings.is_development:
         processors = [
             *shared_processors,
+            redact_log,
             structlog.dev.ConsoleRenderer(colors=True),
         ]
     else:
         processors = [
             *shared_processors,
             structlog.processors.format_exc_info,
+            redact_log,
             structlog.processors.JSONRenderer(),
         ]
 

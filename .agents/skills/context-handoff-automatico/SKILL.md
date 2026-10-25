@@ -15,20 +15,22 @@ Modelos com 1M de contexto perdem precisão quando a conversa se estende. O cont
 ## 🔴 Gatilhos Obrigatórios
 
 Esta habilidade é engatilhada automaticamente nas seguintes situações:
-1. **Logo após criar um plano multi-etapas:** O Kothar fez o discovery, buscou o contexto, criou o plano detalhado. Ele para.
-2. **Ao finalizar qualquer etapa do plano:** O Kothar terminou a Etapa 1. Ele registra o que foi feito, prepara a Etapa 2, e para.
-3. **Se a sessão ultrapassar 150k-200k tokens:** Cansaço iminente detectado pelo `contador-tokens.md`.
+1. **Logo após criar um plano multi-etapas:** O Kothar fez o discovery, buscou o contexto, criou o plano detalhado. Ele para e grava o handoff.
+2. **Ao finalizar qualquer sub-etapa de implementação:** O Kothar terminou a sub-etapa ativa. Ele testa, registra o que foi feito no `handoff-ativo.md`, prepara a próxima sub-etapa e para.
+3. **Se a sessão ultrapassar 60k-80k tokens (ou após 5 tool calls complexas):** Cansaço e risco iminente de rate limit de 5 horas.
 
 ## 🔄 Fluxo de Handoff (Como Funciona)
 
-### Passo 1: A Compressão (Fim da Sessão Atual)
+### Passo 1: A Compressão Estrita (Máximo 50 linhas)
 Quando o gatilho dispara, o Kothar:
-1. Condensa todo o contexto bruto (pesquisas soltas, logs longos) em informações objetivas.
+1. Condensa todo o contexto bruto em estritamente no máximo **50 linhas de texto Markdown**.
 2. Atualiza ou cria o arquivo `00_Memoria/Snapshots/handoff-ativo.md`.
 3. O `handoff-ativo.md` conterá **apenas**:
-   - O plano geral e o progresso.
-   - O resultado já aprimorado e detalhado do discovery/pesquisas iniciais (sem o lixo da pesquisa bruta).
-   - O escopo estrito da **próxima etapa**.
+   - Projeto e status da fase.
+   - O que foi concluído (3-5 bullets).
+   - O escopo estrito da **próxima sub-etapa** (1 único módulo ou endpoint).
+   - Dependências imediatas obtidas via Grafo (Neo4j / AST), sem dumps de arquivos.
+   - **PROIBIDO:** colar logs de erros, transcrições longas ou código fonte completo dentro do handoff.
 
 ### Passo 2: O Alerta (Interrupção)
 O Kothar emite o seguinte bloco EXATO na tela do usuário, parando qualquer execução:

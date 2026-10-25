@@ -24,6 +24,18 @@ Os subagentes operam isolados no `project-sandbox` antes do merge:
 - **Agente Dev (Backend):** Responsável por regra de negócio e lógica de dados `backend/`.
 - **Agente QA (Testador):** Avalia sintaxe, linters e roda o DoD para validar o trabalho dos Devs.
 
+### 2.1 Regras de Segurança Injetadas em Subagentes
+
+Todo subagente spawnado pelo Swarm Router HERDA as seguintes regras de segurança:
+
+**Dev Frontend:** Proibido localStorage para sessão/auth, proibido console.log com dados sensíveis, proibido innerHTML sem sanitização, obrigatório gerenciar auth via HttpOnly Cookie.
+
+**Dev Backend:** Obrigatório rate limiting em rotas públicas e de auth (login: max 5/15min), obrigatório session store server-side (Redis/Postgres), obrigatório headers de segurança, obrigatório validação de input, proibido CORS wildcard em produção.
+
+**QA Testador:** Deve verificar explicitamente: rate limiting, localStorage com tokens, console.log sensíveis, headers de segurança, CORS, validação de input, SQL parametrizado, portas expostas, credenciais hardcoded. Rejeitar entrega com falha de segurança.
+
+> **Referência completa:** skill `kothar-swarm/SKILL.md` contém as regras detalhadas de cada papel.
+
 ### 3. Sincronização
 Os agentes não "conversam" entre si no vácuo. Todo o estado do que estão fazendo é logado no `00_Memoria/Projetos/estado-atual.md` (no formato Markdown pro usuário ver) e os raciocínios técnicos ficam gravados via `rag-engine` no ChromaDB.
 

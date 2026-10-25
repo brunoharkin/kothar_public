@@ -105,3 +105,4 @@ watchdog_status.json
 .ssh_deploy/
 *.pub
 
+scratch/

@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * KOTHAR v6.0 — Metrics API Client (ATUALIZADO)
  * Agora usa endpoint unificado /api/dashboard
@@ -100,7 +101,7 @@ export interface DashboardData {
 }
 
 async function fetchJSON<T>(url: string): Promise<T> {
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

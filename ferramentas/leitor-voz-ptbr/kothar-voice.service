@@ -1,0 +1,15 @@
+[Unit]
+Description=Kothar Voice - Servidor Leitor Neural de Texto pt-BR
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /home/bruno-harkin/kothar/ferramentas/leitor-voz-ptbr/servidor.js
+Restart=always
+RestartSec=3
+WorkingDirectory=/home/bruno-harkin/kothar/ferramentas/leitor-voz-ptbr
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target
+

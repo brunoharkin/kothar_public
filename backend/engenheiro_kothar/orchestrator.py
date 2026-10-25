@@ -7,30 +7,33 @@
  Recebe tarefas, cria blueprints, delega para especialistas,
  monitora progresso, compila resultado e cristaliza Skills.
 
- AGORA COM EXECUÇÃO REAL VIA BlueprintExecutor.
+ Execução via BlueprintExecutor exige handler real; ausência bloqueia o fluxo.
 """
 
 import uuid
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
-from backend.agents.base_agent import BaseAgent
-from backend.core.logger import get_logger
-from backend.core.task_classifier import classify_task, get_optimal_model, TaskComplexity
-from backend.core.context_compressor import compress_for_model
+from backend.contracts.security import approved_result, security_coverage_approved
+from backend.contracts.task_execution import TaskExecutionPlan
 from backend.core.cascade_executor import get_cascade_executor
-from backend.harness.blueprint_executor import blueprint_executor, FlowResult
+from backend.core.context_compressor import compress_for_model
+from backend.core.logger import get_logger
+from backend.core.task_classifier import classify_task
+from backend.engenheiro_kothar.contracts import (
+    transition_contract,
+    validate_blueprint_steps,
+)
+from backend.engenheiro_kothar.routing import TaskRequirements, route_task
+from backend.engenheiro_kothar.task_executor import prepare_task_executor
+from backend.harness.blueprint_executor import FlowResult, blueprint_executor
 from backend.memory.cache.redis_client import RedisMemory
 from backend.memory.graph.graph_rag import graph_rag
 from backend.memory.semantic.chroma_client import chroma_memory
 from backend.memory.semantic.hyde_search import HyDESearch
 from backend.memory.vault.vault_reader import vault_reader
-from backend.trace.models import Blueprint
 from backend.trace.session_compiler import session_compiler
 from backend.trace.trace_recorder import trace_recorder
-from backend.engenheiro_kothar.contracts import (
-    transition_contract,
-    validate_blueprint_steps,
-)
 
 log = get_logger("engenheiro_kothar.orchestrator")
 
@@ -64,6 +67,8 @@ class EngenheiroKothar:
         task_description: str,
         session_id: str | None = None,
         metadata: dict[str, Any] | None = None,
+        requirements: TaskRequirements | dict | None = None,
+        execution_plan: TaskExecutionPlan | dict | None = None,
     ) -> dict[str, Any]:
         """
         Ponto de entrada principal do Engenheiro Kothar.
@@ -142,6 +147,8 @@ class EngenheiroKothar:
         blueprint = await self._create_blueprint(
             session_id=session_id,
             task_description=task_description,
+            requirements=requirements,
+            execution_plan=execution_plan,
         )
 
         # 3. Salva blueprint e contexto no Redis (agentes vão ler daqui)
@@ -157,11 +164,12 @@ class EngenheiroKothar:
         return {
             "session_id": session_id,
             "blueprint": blueprint,
-            "status": "orchestrating",
+            "status": "blocked" if blueprint["routing"]["blockers"] else "orchestrating",
+            "routing": blueprint["routing"],
             "message": (
                 f"Sessão {session_id[:8]} iniciada. "
                 f"Blueprint com {len(blueprint.get('steps', []))} passos criado. "
-                f"Agentes prontos para execução."
+                f"Execução depende de operações tipadas e workspace configurado."
             ),
         }
 
@@ -187,6 +195,19 @@ class EngenheiroKothar:
         if not blueprint:
             raise ValueError(f"Blueprint não encontrado para sessão {session_id}")
 
+        if task_handler is None:
+            task_handler, blockers = prepare_task_executor(blueprint)
+            if blockers:
+                blueprint["execution_status"] = "blocked"
+                blueprint["execution_error"] = "; ".join(blockers)
+                blueprint["production_ready"] = False
+                await self.redis.set_blueprint(session_id, blueprint)
+                return FlowResult(
+                    session_id=session_id, status="blocked",
+                    total_steps=len(blueprint.get("steps", [])), completed_steps=0,
+                    failed_steps=0, skipped_steps=0, error="; ".join(blockers),
+                )
+
         # Executa via harness
         result = await blueprint_executor.execute(
             session_id=session_id,
@@ -194,8 +215,16 @@ class EngenheiroKothar:
             task_context={"session_id": session_id},
         )
 
+        # Preserva os passos atualizados pelo executor ao registrar a situação final.
+        current_blueprint = await self.redis.get_blueprint(session_id)
+        if current_blueprint:
+            current_blueprint["execution_status"] = result.status
+            current_blueprint["execution_error"] = result.error
+            current_blueprint["production_ready"] = False
+            await self.redis.set_blueprint(session_id, current_blueprint)
+
         log.info(
-            f"✅ Execução concluída: {result.status}",
+            f"Execução retornou: {result.status}",
             session_id=session_id,
             completed=result.completed_steps,
             failed=result.failed_steps,
@@ -212,21 +241,35 @@ class EngenheiroKothar:
         await trace_recorder.record_decision(
             session_id=session_id,
             agent_name="engenheiro_kothar",
-            decision="Compilando sessão e gravando no Cofre",
+            decision="Verificando condições de finalização da sessão",
         )
 
         # Imposição do Bloqueio de QA
         blueprint = await self.redis.get_blueprint(session_id)
-        if blueprint:
-            qa_steps = [s for s in blueprint.get("steps", []) if s.get("agent") == "qa"]
-            if qa_steps:
-                last_qa = qa_steps[-1]
-                if last_qa.get("status") != "done":
-                    log.error("Mandato de QA Violado. Entrega bloqueada.", session_id=session_id)
-                    raise ValueError("Bloqueio de Arquitetura: QA Supremo não aprovou a entrega. Os testes E2E falharam ou foram ignorados.")
+        steps = blueprint.get("steps") if isinstance(blueprint, dict) else None
+        if not isinstance(steps, list) or not steps or any(
+            not isinstance(step, dict) or step.get("status") != "done" for step in steps
+        ):
+            raise ValueError("Entrega bloqueada: blueprint ausente, inválido ou incompleto.")
+        security_steps = [step for step in steps if step.get("agent") == "security"]
+        qa_steps = [step for step in steps if step.get("agent") == "qa"]
+        if not security_steps or any(
+            not security_coverage_approved(step.get("result")) for step in security_steps
+        ):
+            raise ValueError("Entrega bloqueada: segurança sem aprovação e cobertura verificáveis.")
+        if not qa_steps or any(
+            not approved_result(step.get("result"), "passed") for step in qa_steps
+        ):
+            raise ValueError("Entrega bloqueada: QA sem aprovação verificável.")
 
         # Compila sessão (traces → Vault + análise de erros)
         compilation = await session_compiler.compile(session_id)
+        if compilation.get("error"):
+            raise ValueError("Entrega bloqueada: falha na compilação da sessão.")
+        compilation["production_ready"] = False
+        compilation["limitations"] = [
+            "Scanner de credenciais e QA não substituem gate de produção e revisão independente."
+        ]
 
         # Encerra sessão no trace
         await trace_recorder.end_session(
@@ -316,11 +359,11 @@ class EngenheiroKothar:
                 tool_output={
                     "locks": [
                         {
-                            "id": l.get("id"),
-                            "pattern": l.get("metadata", {}).get("pattern"),
-                            "similarity": l.get("similarity"),
+                            "id": lock.get("id"),
+                            "pattern": lock.get("metadata", {}).get("pattern"),
+                            "similarity": lock.get("similarity"),
                         }
-                        for l in locks
+                        for lock in locks
                     ]
                 },
                 metadata={"lock_count": len(locks), "task": task_description[:200]},
@@ -340,16 +383,18 @@ class EngenheiroKothar:
         self,
         session_id: str,
         task_description: str,
+        requirements: TaskRequirements | dict | None = None,
+        execution_plan: TaskExecutionPlan | dict | None = None,
     ) -> dict[str, Any]:
         """
         Cria o Blueprint da tarefa.
-        Em produção: usa LLM para decompor a tarefa em passos.
-        Nesta versão: blueprint estrutural baseado em keywords.
+        O mapa declara agentes, skills, capacidades e dependências necessárias.
         """
         blueprint_id = str(uuid.uuid4())
 
-        # Decomposição baseada em palavras-chave (determinística)
-        steps = self._decompose_task(task_description)
+        routing = route_task(task_description, requirements)
+        plan = execution_plan if isinstance(execution_plan, TaskExecutionPlan) else TaskExecutionPlan.model_validate(execution_plan or {})
+        steps = routing["steps"]
 
         steps = validate_blueprint_steps(steps)
         blueprint = {
@@ -360,6 +405,11 @@ class EngenheiroKothar:
             "steps": steps,
             "status": "active",
             "assigned_agent": "engenheiro_kothar",
+            "routing": routing,
+            "execution_plan": plan.model_dump(),
+            "execution_status": "blocked" if routing["blockers"] else "pending",
+            "execution_error": "; ".join(routing["blockers"]) or None,
+            "production_ready": False,
         }
 
         await trace_recorder.record(
@@ -375,115 +425,8 @@ class EngenheiroKothar:
 
     @staticmethod
     def _decompose_task(task: str) -> list[dict[str, Any]]:
-        """
-        Decompõe a tarefa em passos baseado em padrões.
-        Versão determinística — substituir por LLM em produção.
-        """
-        base_steps = [
-            {"id": 0, "title": "Triagem e Recepção (Prompt Enhancer)", "description": "Lê a instrução curta e gera Dossiê ou devolve Bypass", "status": "pending", "agent": "triage_agent", "reasoning_effort": "low"},
-            {"id": 1, "title": "Diagnóstico", "description": "Analisar o estado atual", "status": "pending", "agent": "architect", "reasoning_effort": "high"},
-            {"id": 2, "title": "Planejamento", "description": "Criar plano de execução detalhado", "status": "pending", "agent": "architect", "reasoning_effort": "high"},
-            {"id": 2.5, "title": "Relational Experience Mapping", "description": "Aplicar Filosofia MuMu-Pattern (Foreshadowing e Intimidade) no planejamento da experiência final", "status": "pending", "agent": "architect", "reasoning_effort": "medium"},
-            {"id": 3, "title": "Verificação de Locks", "description": "Verificar travas e erros conhecidos", "status": "pending", "agent": "engenheiro_kothar", "reasoning_effort": "low"},
-            {"id": 4, "title": "Busca de Skills", "description": "Buscar skills relevantes no RAG", "status": "pending", "agent": "engenheiro_kothar", "reasoning_effort": "low"},
-            {"id": 4.5, "title": "Estrutura (Scaffold) & Portable Design", "description": "Gerar o arquivo DESIGN.md na raiz (Portable Design System) e definir separação em pastas", "status": "pending", "agent": "structure_agent", "reasoning_effort": "medium"},
-            {"id": 4.6, "title": "Auditoria de Passo (Supervisor)", "description": "Auditar entrega do Scaffold", "status": "pending", "agent": "supervisor_agent", "reasoning_effort": "medium"},
-            {"id": 5, "title": "Execução Frontend", "description": f"Codificar Interface: {task[:50]}", "status": "pending", "agent": "frontend_engineer", "reasoning_effort": "medium"},
-            {"id": 5.01, "title": "Auditoria de Passo (Supervisor)", "description": "Auditar entrega do Frontend", "status": "pending", "agent": "supervisor_agent", "reasoning_effort": "medium"},
-            {"id": 5.1, "title": "Execução Backend", "description": f"Codificar Lógica e Scripts Locais: {task[:50]}", "status": "pending", "agent": "backend_engineer", "reasoning_effort": "high"},
-            {"id": 5.11, "title": "Auditoria de Passo (Supervisor)", "description": "Auditar entrega do Backend", "status": "pending", "agent": "supervisor_agent", "reasoning_effort": "high"},
-            {"id": 5.2, "title": "Revisão de Código (Clean Code)", "description": "Inspecionar erros de sintaxe, imports falsos e spaghetti code", "status": "pending", "agent": "code_reviewer", "reasoning_effort": "high"},
-            {"id": 6, "title": "Auditoria de Segurança", "description": "Verificar chaves expostas e má práticas", "status": "pending", "agent": "security", "reasoning_effort": "high"},
-            {"id": 7, "title": "QA", "description": "Validar resultado", "status": "pending", "agent": "qa", "reasoning_effort": "medium"},
-            {"id": 8, "title": "Compilação", "description": "Gravar relatório no Cofre", "status": "pending", "agent": "engenheiro_kothar", "reasoning_effort": "low"},
-        ]
-
-        task_lower = task.lower()
-        
-        # 1. Modo Ofensivo (Teste de Invasão / DAST)
-        if any(kw in task_lower for kw in ["teste", "testar", "invasao", "invazao", "invadir", "penetration", "url", "varredura"]):
-            # Se for explicitamente um teste de invasão, pula o desenvolvimento e foca no Security Agent
-            return [
-                {"id": 1, "title": "Diagnóstico de Alvo", "description": "Mapear alvo da invasão", "status": "pending", "agent": "architect"},
-                {"id": 2, "title": "Engenharia de Invasão (DAST)", "description": f"Executar Arsenal Nuclei contra: {task[:100]}", "status": "pending", "agent": "security"},
-                {"id": 3, "title": "Compilação do Ataque", "description": "Gravar falhas encontradas no Cofre", "status": "pending", "agent": "engenheiro_kothar"},
-            ]
-
-        # 2. A Sinfonia do Frontend (Workflow Mestre)
-        if any(kw in task_lower for kw in ["página", "pagina", "interface", "frontend", "ui", "componente", "site"]):
-            # Insere Copywriter e Artista UI antes da Execução (que está no index 4)
-            base_steps.insert(4, {
-                "id": 4.1, "title": "Copywriting (PAS/AIDA)",
-                "description": "Criar textos persuasivos e CTAs",
-                "status": "pending", "agent": "copywriter"
-            })
-            base_steps.insert(5, {
-                "id": 4.2, "title": "Diretrizes WebGL e Design",
-                "description": "Definir efeitos visuais High-End",
-                "status": "pending", "agent": "ui_artist"
-            })
-
-        # 2.5. A Sinfonia Code-to-Video (Redes Sociais / Remotion)
-        if any(kw in task_lower for kw in ["vídeo", "video", "reel", "tiktok", "youtube", "criativo ads", "motion"]):
-            base_steps.insert(4, {
-                "id": 4.3, "title": "Copywriting de Vídeo & Roteiro",
-                "description": "Criar roteiro para o vídeo focando no gancho inicial",
-                "status": "pending", "agent": "copywriter"
-            })
-            
-            # Se for vídeo com "apresentador", adicionamos o pipeline do PersonaLive
-            if any(kw in task_lower for kw in ["apresentador", "porta-voz", "avatar", "humano", "falando", "talking head", "narrador"]):
-                base_steps.insert(5, {
-                    "id": 4.31, "title": "Geração de Áudio (TTS / Voice Specialist)",
-                    "description": "Transformar o roteiro aprovado em arquivo de áudio narrado",
-                    "status": "pending", "agent": "voice_specialist"
-                })
-                base_steps.insert(6, {
-                    "id": 4.32, "title": "Animação de Avatar (PersonaLive / Fila Resiliente)",
-                    "description": "Renderizar vídeo do Avatar sincronizado com o áudio (Lip-Sync). Aguardar GPU livre, se necessário.",
-                    "status": "pending", "agent": "avatar_video_specialist"
-                })
-                # O Remotion vira o passo 7 (indice 7)
-                base_steps.insert(7, {
-                    "id": 4.4, "title": "Programação de Vídeo (Remotion)",
-                    "description": "Envelopar o MP4 do Avatar gerado na composição final do Remotion",
-                    "status": "pending", "agent": "social_media_video_specialist"
-                })
-            else:
-                base_steps.insert(5, {
-                    "id": 4.4, "title": "Programação de Vídeo (Remotion)",
-                    "description": "Estruturar o projeto React Remotion com as animações baseadas no roteiro",
-                    "status": "pending", "agent": "social_media_video_specialist"
-                })
-
-        # 3. Engenharia de Dados Suprema (DBA)
-        # Injeta o DBA logo após o Arquiteto/Planejamento se envolver banco de dados
-        if any(kw in task_lower for kw in ["banco de dados", "bd", "sql", "nosql", "dados", "database", "postgres", "redis", "neo4j", "schema", "tabela"]):
-            base_steps.insert(2, {
-                "id": 2.5, "title": "Modelagem de Dados (DBA)",
-                "description": "Ditar arquitetura do BD e aplicar regra DUMB_FRONTEND",
-                "status": "pending", "agent": "data_engineer"
-            })
-
-        # 4. LGPD & DPO (Auditor de Compliance)
-        if any(kw in task_lower for kw in ["usuário", "usuario", "cliente", "cadastro", "login", "senha", "dados", "banco", "perfil", "lgpd", "pii"]):
-            exec_index = next((i for i, s in enumerate(base_steps) if s["agent"] == "engineer"), -1)
-            if exec_index != -1:
-                base_steps.insert(exec_index + 1, {
-                    "id": 5.5, "title": "Auditoria de Compliance (LGPD)",
-                    "description": "Verificar criptografia de PII e hash Argon2 (Mandato ENCRYPT_PII)",
-                    "status": "pending", "agent": "dpo"
-                })
-
-        # Adiciona passo de infra se for tarefa de deploy/docker
-        if any(kw in task_lower for kw in ["docker", "deploy", "infra", "porta", "container"]):
-            base_steps.insert(len(base_steps) - 1, {
-                "id": 7.5, "title": "Containerização & Deploy",
-                "description": "Aplicar CI/CD e empacotar (Mandamento #1)",
-                "status": "pending", "agent": "devops"
-            })
-
-        return base_steps
+        """Compatibilidade: a fonte de decomposição é o mapa de necessidades."""
+        return route_task(task)["steps"]
 
     async def get_session_status(self, session_id: str) -> dict[str, Any]:
         """Retorna status atual da sessão via Redis."""
@@ -499,6 +442,9 @@ class EngenheiroKothar:
         return {
             "session_id": session_id,
             "context": context,
+            "status": blueprint.get("execution_status", "pending"),
+            "error": blueprint.get("execution_error"),
+            "production_ready": False,
             "progress": f"{completed}/{total}",
             "progress_pct": round(completed / total * 100) if total > 0 else 0,
             "blueprint_id": blueprint.get("id"),

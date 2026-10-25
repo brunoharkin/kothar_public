@@ -19,11 +19,13 @@ import { AgentsPage } from './paginas/agents/agents.page';
 import { DataLakePage } from './paginas/datalake/datalake.page';
 import { PromptLabPage } from './paginas/promptlab/promptlab.page';
 import { TokenUsagePage } from './paginas/token-usage/token-usage.page';
+import { EvolucaoPage } from './paginas/evolucao/evolucao.page';
+import { verificarSessao, encerrarSessao, limparSessao } from './seguranca/sessao';
 import { LoginPage } from './paginas/login/LoginPage';
 import { Flame } from 'lucide-react';
 import './App.styles.css';
 
-type PageId = 'trace' | 'graph' | 'metrics' | 'ollama' | 'memory' | 'agents' | 'datalake' | 'promptlab' | 'temperature' | 'tokenusage';
+type PageId = 'trace' | 'graph' | 'metrics' | 'ollama' | 'memory' | 'agents' | 'datalake' | 'promptlab' | 'temperature' | 'tokenusage' | 'evolucao';
 
 interface NavItem {
   id: PageId;
@@ -43,6 +45,13 @@ const navGroups: NavGroup[] = [
   {
     title: 'Observabilidade',
     items: [
+      {
+        id: 'evolucao',
+        label: 'Evolução',
+        description: 'Execução, memória e prospecção',
+        icon: Workflow,
+        color: '#3b82f6',
+      },
       {
         id: 'trace',
         label: 'Traces',
@@ -87,25 +96,38 @@ const navGroups: NavGroup[] = [
 ];
 
 export function App() {
-  const validPages: PageId[] = ['trace', 'graph', 'metrics', 'ollama', 'memory', 'agents', 'datalake', 'promptlab', 'temperature', 'tokenusage'];
+  const validPages: PageId[] = ['trace', 'graph', 'metrics', 'ollama', 'memory', 'agents', 'datalake', 'promptlab', 'temperature', 'tokenusage', 'evolucao'];
   const [activePage, setActivePage] = useState<PageId>(() => {
     const hash = window.location.hash.replace('#', '');
     return (validPages.includes(hash as PageId) ? hash as PageId : 'trace');
   });
   const [hoveredItem, setHoveredItem] = useState<PageId | null>(null);
   
-  // Auth state
-  const [token, setToken] = useState<string | null>(localStorage.getItem('kothar_token'));
+  const [authenticated, setAuthenticated] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [authError, setAuthError] = useState('');
 
-  const handleLogin = (newToken: string) => {
-    localStorage.setItem('kothar_token', newToken);
-    setToken(newToken);
+  const handleLogin = () => { setAuthError(''); setAuthenticated(true); };
+  const handleLogout = async () => {
+    try { await encerrarSessao(); }
+    catch { setAuthError('Não foi possível sair. Tente novamente.'); }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('kothar_token');
-    setToken(null);
-  };
+  React.useEffect(() => {
+    let active = true;
+    const ended = () => { if (active) setAuthenticated(false); };
+    window.addEventListener('kothar:session-ended', ended);
+    verificarSessao().then(ok => { if (active) setAuthenticated(ok); })
+      .catch(() => { if (active) setAuthError('Serviço de autenticação indisponível.'); })
+      .finally(() => { if (active) setCheckingSession(false); });
+    const refresh = () => {
+      if (!document.hidden) verificarSessao().then(ok => { if (active) setAuthenticated(ok); })
+        .catch(() => { limparSessao(); });
+    };
+    document.addEventListener('visibilitychange', refresh);
+    return () => { active = false; window.removeEventListener('kothar:session-ended', ended);
+      document.removeEventListener('visibilitychange', refresh); };
+  }, []);
 
   React.useEffect(() => {
     window.location.hash = activePage;
@@ -122,8 +144,10 @@ export function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  if (!token) {
-    return <LoginPage onLogin={handleLogin} />;
+  if (checkingSession) return <main role="status">Verificando sessão…</main>;
+
+  if (!authenticated) {
+    return <LoginPage onLogin={handleLogin} initialError={authError} />;
   }
 
   return (
@@ -152,7 +176,7 @@ export function App() {
 
         {/* Navigation */}
         <nav className="app-nav">
-          {navGroups.map((group, groupIndex) => (
+          {navGroups.map((group) => (
             <div key={group.title} className="app-nav-group">
               <div className="app-nav-group-title">{group.title}</div>
               {group.items.map((item) => {
@@ -335,6 +359,7 @@ export function App() {
 
       {/* Main Content */}
       <main className="app-main">
+        {authError && <p role="alert">{authError}</p>}
         <AnimatePresence mode="wait">
           <motion.div
             key={activePage}
@@ -354,21 +379,12 @@ export function App() {
             {activePage === 'promptlab' && <PromptLabPage />}
             {activePage === 'temperature' && <ControleDeTemperaturaPage />}
             {activePage === 'tokenusage' && <TokenUsagePage />}
+            {activePage === 'evolucao' && <EvolucaoPage />}
           </motion.div>
         </AnimatePresence>
       </main>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    minHeight: '100vh',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-    backgroundColor: '#0d1117',
-    color: '#c9d1d9',
-  },
-};
 
 export default App;

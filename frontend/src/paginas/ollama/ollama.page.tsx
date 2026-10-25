@@ -1,13 +1,13 @@
+import { apiFetch } from '../../seguranca/sessao';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings, Save, BrainCircuit, User, Archive,
-  Wifi, WifiOff, X, Plus, Trash2, Zap,
+  Wifi, WifiOff, X, Plus, Trash2,
   FileDown, AlertTriangle, FolderOpen, Calendar, Copy, ZoomIn,
-  FileText, ChevronRight
+  FileText
 } from 'lucide-react';
 import { ollamaAPI, OllamaMessage, OllamaModel } from './ollama.api';
-import { marked } from 'marked';
 import { AIChatInput } from '../../componentes/ui/ai-chat-input';
 import './ollama.styles.css';
 
@@ -23,31 +23,16 @@ interface ChatColumn {
 const generateId = () => typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : '00000000-0000-0000-0000-000000000000'.replace(/0/g, () => (~~(Math.random() * 16)).toString(16));
 
 export function OllamaChatPage() {
-  const [columns, setColumns] = useState<ChatColumn[]>(() => {
-    const saved = localStorage.getItem('kothar-chat-columns');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Se a coluna estiver carregando, manteremos ela como true para poder reconectar!
-        return parsed.map((col: any) => ({ ...col }));
-      } catch (e) {}
-    }
-    return [{
+  const [columns, setColumns] = useState<ChatColumn[]>([{
       id: generateId(),
       selectedModel: '',
       messages: [],
       input: '',
       isLoading: false,
       sessionId: null
-    }];
-  });
-
-  useEffect(() => {
-    localStorage.setItem('kothar-chat-columns', JSON.stringify(columns));
-  }, [columns]);
+    }]);
   
   const [models, setModels] = useState<OllamaModel[]>([]);
-  const [baseUrl, setBaseUrl] = useState('http://kothar_ollama:11434');
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [ollamaConnected, setOllamaConnected] = useState(false);
   const [ollamaError, setOllamaError] = useState<string | null>(null);
@@ -65,7 +50,7 @@ export function OllamaChatPage() {
     if (!codeModal) return;
     const name = codeModal.filename || 'artefato';
     try {
-      const response = await fetch('/api/cofre/save', {
+      const response = await apiFetch('/api/cofre/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -92,7 +77,6 @@ export function OllamaChatPage() {
 
   // === KOTHAR v6.0 SUPREMO: Configurações avançadas ===
   const [debugMode, setDebugMode] = useState(false);
-  const [memoryDialog, setMemoryDialog] = useState<{ colId: string; memory: string; stats: any } | null>(null);
   const [advancedParams, setAdvancedParams] = useState({
     temperature: 0.7,
     num_ctx: 12288,
@@ -101,12 +85,9 @@ export function OllamaChatPage() {
     top_k: 40,
   });
 
-  useEffect(() => {
-    fetchModels();
-  }, [baseUrl]);
+  useEffect(() => { fetchModels(); }, []);
 
   const fetchModels = async () => {
-    ollamaAPI.setBaseUrl(baseUrl);
     const m = await ollamaAPI.getModels();
     setModels(m);
     setOllamaConnected(ollamaAPI.isConnected());
@@ -135,7 +116,7 @@ export function OllamaChatPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const resumeStream = async (colId: string, sessionId: string) => {
+  const resumeStream = async (colId: string, _sessionId: string) => {
     try {
       // O backend cria a sessão no worker usando request.session_id (que passamos como colId no chat)
       const res = await ollamaAPI.connectStream(colId, (chunk) => {
@@ -180,7 +161,7 @@ export function OllamaChatPage() {
 
   const loadHistory = async () => {
     try {
-      const res = await fetch('/api/sessions/');
+      const res = await apiFetch('/api/sessions/');
       if (res.ok) {
         const data = await res.json();
         const items = Array.isArray(data) ? data : (data.items || []);
@@ -196,7 +177,7 @@ export function OllamaChatPage() {
 
   const openSessionInNewColumn = async (id: string, modelName: string) => {
     try {
-      const res = await fetch(`/api/traces/?session_id=${id}&limit=200`);
+      const res = await apiFetch(`/api/traces/?session_id=${id}&limit=200`);
       if (res.ok) {
         const data = await res.json();
         const traces = Array.isArray(data) ? data : (data.items || []);
@@ -414,7 +395,7 @@ export function OllamaChatPage() {
 
     try {
       // Envia para backend salvar no cofre
-      const response = await fetch('/api/cofre/save', {
+      const response = await apiFetch('/api/cofre/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -545,7 +526,7 @@ export function OllamaChatPage() {
       if (match.index > lastIndex) {
         const textBefore = content.slice(lastIndex, match.index);
         parts.push(
-          <div key={`text-${keyCounter++}`} className="ollama-text-block marked-content" dangerouslySetInnerHTML={{ __html: marked.parse(textBefore) as string }} />
+          <div key={`text-${keyCounter++}`} className="ollama-text-block marked-content">{textBefore}</div>
         );
       }
 
@@ -561,7 +542,7 @@ export function OllamaChatPage() {
     if (lastIndex < content.length) {
       const textAfter = content.slice(lastIndex);
       parts.push(
-        <div key={`text-${keyCounter++}`} className="ollama-text-block marked-content" dangerouslySetInnerHTML={{ __html: marked.parse(textAfter) as string }} />
+        <div key={`text-${keyCounter++}`} className="ollama-text-block marked-content">{textAfter}</div>
       );
     }
 
@@ -581,7 +562,7 @@ export function OllamaChatPage() {
       );
     }
 
-    return parts.length > 0 ? <>{parts}</> : <div className="ollama-text-block marked-content" dangerouslySetInnerHTML={{ __html: marked.parse(content) as string }} />;
+    return parts.length > 0 ? <>{parts}</> : <div className="ollama-text-block marked-content">{content}</div>;
   };
 
   // Regenerar resposta (re-executa última mensagem)
@@ -648,7 +629,7 @@ export function OllamaChatPage() {
             </span>
             <span className="ollama-metric-divider">·</span>
             <span className="ollama-metric-text">
-              {(msg.metrics.total_duration / 1e9).toFixed(1)}s
+              {((msg.metrics.total_duration ?? 0) / 1e9).toFixed(1)}s
             </span>
             {debugMode && msg.metrics.prompt_eval_count && msg.metrics.prompt_eval_count > 500 && (
               <>
@@ -718,6 +699,10 @@ export function OllamaChatPage() {
     </select>
   );
 
+  // Mantém os auxiliares existentes enquanto os controles correspondentes não são exibidos.
+  void sendToAll;
+  void ModelSelector;
+
   return (
     <div className="ollama-container">
       {/* Header */}
@@ -752,10 +737,6 @@ export function OllamaChatPage() {
         {isConfigOpen && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="ollama-config-panel">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-              <div>
-                <label>API Endpoint:</label>
-                <input type="text" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} className="ollama-input-config" style={{ width: '100%' }} />
-              </div>
               <div>
                 <label>🌡️ Temperature: <strong>{advancedParams.temperature.toFixed(2)}</strong></label>
                 <input type="range" min="0" max="1.5" step="0.05" value={advancedParams.temperature}
@@ -794,7 +775,7 @@ export function OllamaChatPage() {
 
       <div className="ollama-content-wrapper">
         {/* Dynamic Grid Columns */}
-        {columns.map((col, index) => (
+        {columns.map((col) => (
           <div key={col.id} className="ollama-chat-column">
             {/* Menu Interativo da Coluna (Unified) */}
             <div className="ollama-split-header" style={{ justifyContent: 'flex-end', borderBottom: 'none', padding: '12px 24px 0 24px' }}>
@@ -1026,7 +1007,7 @@ export function OllamaChatPage() {
                         sandbox="allow-scripts allow-same-origin"
                       />
                     ) : (
-                      <div className="marked-content artifact-markdown" dangerouslySetInnerHTML={{ __html: marked.parse(codeModal.content) as string }} />
+                      <pre className="marked-content artifact-markdown">{codeModal.content}</pre>
                     )}
                   </div>
                 ) : (

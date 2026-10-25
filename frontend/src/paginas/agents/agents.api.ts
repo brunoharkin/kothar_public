@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * Kothar Agents API
  * Lista 20 agentes especialistas disponíveis no Orchestrator
@@ -176,13 +177,13 @@ export const agentsApi = {
   },
 
   async getOrchestratorStatus(sessionId: string) {
-    const res = await fetch(`/api/orchestrate/${sessionId}/status`);
+    const res = await apiFetch(`/api/orchestrate/${sessionId}/status`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
   },
 
   async startOrchestrator(taskDescription: string): Promise<{ session_id: string }> {
-    const res = await fetch('/api/orchestrate/start', {
+    const res = await apiFetch('/api/orchestrate/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ task_description: taskDescription }),

@@ -14,6 +14,8 @@ from backend.agents.architect_agent import ArchitectAgent
 from backend.agents.engineer_agent import EngineerAgent
 from backend.agents.qa_agent import QAAgent
 from backend.agents.security_agent import SecurityAgent
+from backend.contracts.security import approved_result as _approved_result
+from backend.contracts.security import security_coverage_approved
 from backend.core.exceptions import AgentError
 from backend.core.logger import get_logger
 from backend.trace.trace_recorder import trace_recorder
@@ -24,6 +26,8 @@ log = get_logger("engenheiro_kothar.handoff")
 AGENT_REGISTRY = {
     "architect": ArchitectAgent,
     "engineer":  EngineerAgent,
+    "frontend":  EngineerAgent,
+    "backend":   EngineerAgent,
     "security":  SecurityAgent,
     "qa":        QAAgent,
 }
@@ -122,21 +126,29 @@ class Handoff:
         )
         results["architect"] = arch_result
 
-        if arch_result.get("status") != "done":
+        if not _approved_result(arch_result, "done"):
             return {"status": "failed", "failed_at": "architect", "results": results}
 
         blueprint_steps = arch_result.get("blueprint_steps", [])
+        if not isinstance(blueprint_steps, list) or not blueprint_steps or any(
+            not isinstance(step, dict) or "id" not in step
+            or step.get("agent") not in AGENT_REGISTRY
+            for step in blueprint_steps
+        ):
+            return {"status": "failed", "failed_at": "architect", "results": results}
 
         # Passo 2: Engenheiro executa os passos do blueprint
         for step in blueprint_steps:
-            if step.get("agent") != "engineer":
+            if step.get("agent") not in {"engineer", "frontend", "backend"}:
                 continue
             eng_result = await self.delegate(
-                agent_name="engineer",
+                agent_name=step["agent"],
                 session_id=session_id,
                 task={**step, "files": files},
             )
-            results[f"engineer_step_{step['id']}"] = eng_result
+            results[f"{step['agent']}_step_{step['id']}"] = eng_result
+            if not _approved_result(eng_result, "done"):
+                return {"status": "failed", "failed_at": step["agent"], "results": results}
 
         # Passo 3: Auditoria de segurança nos arquivos modificados
         sec_result = await self.delegate(
@@ -146,8 +158,8 @@ class Handoff:
         )
         results["security"] = sec_result
 
-        if sec_result.get("status") == "failed":
-            log.warn("Auditoria de segurança falhou", issues=len(sec_result.get("issues", [])))
+        if not security_coverage_approved(sec_result):
+            return {"status": "failed", "failed_at": "security", "results": results}
 
         # Passo 4: QA
         qa_result = await self.delegate(
@@ -157,10 +169,13 @@ class Handoff:
         )
         results["qa"] = qa_result
 
-        overall_status = "completed" if qa_result.get("status") == "passed" else "completed_with_warnings"
+        if not _approved_result(qa_result, "passed"):
+            return {"status": "failed", "failed_at": "qa", "results": results}
 
         return {
-            "status": overall_status,
+            "status": "completed",
+            "production_ready": False,
+            "security_scope": sec_result.get("scope", "unverified"),
             "pipeline": "architect → engineer → security → qa",
             "results": results,
         }

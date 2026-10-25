@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-10-23T19:13:39.739119",
+  "files_audited": 1,
+  "violations": [
+    {
+      "file": "/home/bruno-harkin/kothar/scripts/kothar_war_room.py",
+      "line": 14,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "/home/bruno-harkin/kothar/scripts/kothar_war_room.py",
+      "line": 14,
+      "type": "HIGH",
+      "description": "IP:Porta exposto"
+    },
+    {
+      "file": "/home/bruno-harkin/kothar/scripts/kothar_war_room.py",
+      "line": 43,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 3
+  }
+}

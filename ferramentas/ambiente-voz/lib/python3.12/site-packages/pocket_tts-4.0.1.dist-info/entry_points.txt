@@ -1,0 +1,2 @@
+[console_scripts]
+pocket-tts = pocket_tts.main:cli_app

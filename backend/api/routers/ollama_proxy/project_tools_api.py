@@ -14,7 +14,7 @@ import asyncio
 from typing import Optional, Dict, Any
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 from backend.core.logger import get_logger
 from backend.core.rag_supremo import rag_supremo, build_rag_context, RAG_MAX_TOTAL_CHUNKS, RAG_CHUNK_MAX_CHARS
@@ -52,9 +52,16 @@ router = APIRouter()
 # =====================================================
 
 class IndexProjectRequest(BaseModel):
-    path: str
+    model_config = ConfigDict(extra="forbid")
+    path: str = Field(min_length=1, max_length=4096)
     file_patterns: Optional[list] = None
-    max_files: int = 500
+    max_files: int = Field(default=500, ge=1, le=500)
+
+
+class ToolExecuteRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(pattern=r"^(read_file|list_dir|search_files|search_code)$")
+    args: dict = Field(default_factory=dict)
 
 
 @router.post("/project/index")
@@ -101,14 +108,9 @@ async def api_tools_schema():
 
 
 @router.post("/tools/execute")
-async def api_execute_tool(request: Request):
+async def api_execute_tool(body: ToolExecuteRequest):
     """Executa uma tool diretamente (sem LLM)."""
-    body = await request.json()
-    name = body.get("name")
-    args = body.get("args", {})
-    if not name:
-        return {"ok": False, "error": "Missing tool name"}
-    result = execute_tool(name, args)
+    result = execute_tool(body.name, body.args)
     return result
 
 

@@ -15,6 +15,7 @@ description: >-
 
 Kothar **NUNCA** escreve "✅ Pronto" sem antes verificar cada item do DoD específico do tipo de feature. Se algum item falhar, volta pra Build, não pra Ship.
 Toda entrega precisa ter pelo menos um indicador de assertividade executável validado com sucesso via `validador.sh` e score >= 90 em `analise-codigo.py`.
+Toda resposta final inclui o relatório de `auto-relatabilidade`: agentes, habilidades, ferramentas/verificações e limitações reais da interação. O relatório não substitui evidências nem aprova produção.
 
 ---
 
@@ -64,6 +65,16 @@ Toda entrega precisa ter pelo menos um indicador de assertividade executável va
 □ "Pronto para publicar" só pode ser declarado após validar o pacote e todos os campos obrigatórios da loja
 ```
 
+## 📋 DoD: Zero-Hallucination & YAGNI Ladder (Pré-Build)
+
+```
+□ YAGNI Ladder: Validado que o código novo é estritamente necessário (não reinventa lib/função já existente)
+□ Mapeamento de Dependências: Nenhuma API, método ou import foi "inventado" ou suposto
+□ Rastreabilidade de Estrutura: Relações marcadas mentalmente como KNOWN (visto em arquivo real), INFERRED ou UNKNOWN
+□ Eliminação de Código Fantasma: Sem stubs vazios, sem placeholders "TODO implementar depois", sem mock em produção
+□ Verificação Fechada: Compilador (py_compile / tsc) e suíte de testes executados com 100% de sucesso no mesmo ciclo
+```
+
 ## 📋 DoD: Backend (rota/endpoint/serviço)
 
 ```
@@ -72,12 +83,14 @@ Toda entrega precisa ter pelo menos um indicador de assertividade executável va
 □ Erros tratados: input inválido, não encontrado, falha de DB, timeout
 □ Log de erro não expõe credencial ou dado sensível
 □ Autenticação/autorização aplicada (se rota privada)
-□ Rate limit aplicado (se rota pública)
+□ Rate limit aplicado — OBRIGATÓRIO em rotas públicas e de autenticação (login, registro, reset de senha). Sem rate limiting = BLOQUEIO DE ENTREGA.
 □ Sem credencial hardcoded (DATABASE_URL, API_KEY, etc.)
 □ Sem variável não usada / import quebrado
 □ Documentação da rota atualizada (descrição, params, response)
 □ Sem regressão em rotas existentes (smoke test em rotas vizinhas)
 ```
+
+> ⚠️ **Rate Limiting é INEGOCIÁVEL em produção.** Todo endpoint público ou de autenticação DEVE ter rate limiting (ex: express-rate-limit, slowapi, nginx limit_req). Sem rate limiting = brute force aberto = vulnerabilidade CRÍTICA.
 
 ---
 

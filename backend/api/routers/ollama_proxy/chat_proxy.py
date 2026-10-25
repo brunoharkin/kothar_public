@@ -47,7 +47,6 @@ log = get_logger("api.ollama_proxy")
 router = APIRouter()
 
 
-from .worker import worker_state, ollama_background_worker
 from .rag_injection import inject_rag_into_messages
 
 # URL base do Ollama (configurável via env)
@@ -126,11 +125,8 @@ async def proxy_request(method: str, path: str, body: Optional[dict] = None, hea
 
 @router.post("/proxy/chat")
 async def proxy_chat_custom(request: Request, body: dict):
-    """Chat com Ollama via proxy. Aceita _ollama_url no body."""
-    target_url = body.get("_ollama_url") or body.get("ollama_url") or OLLAMA_BASE_URL
-    
-    if target_url and "localhost" in target_url:
-        target_url = target_url.replace("localhost", "kothar_ollama")
+    """Chat com Ollama pelo destino interno configurado no servidor."""
+    target_url = OLLAMA_BASE_URL
         
     session_id = body.get("session_id") or body.get("_ollama_session") or "default"
 
@@ -188,7 +184,7 @@ async def proxy_chat_custom(request: Request, body: dict):
             message = data.get("message", {})
             
             if message.get("tool_calls"):
-                log.info(f"[{session_id[:8]}] LLM invocou tools: {message['tool_calls']}")
+                log.info("LLM solicitou ferramentas", session_id=session_id[:8], count=len(message["tool_calls"]))
                 
                 # Anexa a decisao (tool_calls) ao historico para o LLM ter o contexto
                 clean_body["messages"].append(message)
@@ -199,7 +195,7 @@ async def proxy_chat_custom(request: Request, body: dict):
                     name = func.get("name")
                     args = func.get("arguments", {})
                     
-                    log.info(f"[{session_id[:8]}] Executando tool '{name}' com args: {args}")
+                    log.info("Executando ferramenta permitida", session_id=session_id[:8], tool_name=name)
                     result = execute_tool(name, args)
                     formatted_result = format_tool_result(result)
                     
@@ -237,69 +233,13 @@ async def proxy_chat_custom(request: Request, body: dict):
 
 @router.post("/proxy/chat_async")
 async def proxy_chat_async(request: Request, body: dict):
-    """Enfileira um chat para gerar em background"""
-    target_url = body.get("_ollama_url") or body.get("ollama_url") or OLLAMA_BASE_URL
-    if target_url and "localhost" in target_url:
-        target_url = target_url.replace("localhost", "kothar_ollama")
-        
-    session_id = body.get("session_id") or body.get("_ollama_session")
-    if not session_id:
-        import uuid
-        session_id = str(uuid.uuid4())
-
-    clean_body = {k: v for k, v in body.items() if k not in ["_ollama_url", "ollama_url"]}
-    await inject_rag_into_messages(clean_body, session_id)
-
-    # Inicia sessão
-    worker_state.sessions[session_id] = {
-        "history": [],
-        "subscribers": [],
-        "is_done": False,
-        "metrics": None,
-        "error": None
-    }
-    
-    await worker_state.queue.put({
-        "session_id": session_id,
-        "target_url": target_url,
-        "body": clean_body
-    })
-    
-    return {"status": "queued", "session_id": session_id}
+    """Bloqueado até existir fila Redis durável com recuperação testada."""
+    raise HTTPException(status_code=503, detail="Fila assíncrona temporariamente indisponível")
 
 @router.get("/proxy/chat_stream/{session_id}")
 async def proxy_chat_stream(session_id: str):
-    """Lê os chunks ao vivo ou histórico se já acabou, via SSE"""
-    sess = worker_state.sessions.get(session_id)
-    if not sess:
-        raise HTTPException(status_code=404, detail="Sessão não encontrada no worker")
-        
-    async def event_generator():
-        # Envia histórico que já rolou
-        for chunk in sess["history"]:
-            yield f"data: {chunk}\n\n"
-            
-        if sess["is_done"]:
-            return
-            
-        # Se não acabou, se inscreve pra receber novos
-        q = asyncio.Queue()
-        sess["subscribers"].append(q)
-        try:
-            while True:
-                chunk = await q.get()
-                yield f"data: {chunk}\n\n"
-                try:
-                    d = json.loads(chunk)
-                    if d.get("done") or "error" in d:
-                        break
-                except:
-                    pass
-        finally:
-            if q in sess["subscribers"]:
-                sess["subscribers"].remove(q)
-                
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    """Bloqueado junto com a fila assíncrona não durável."""
+    raise HTTPException(status_code=503, detail="Stream assíncrono temporariamente indisponível")
 
 
 async def proxy_request_to(target_url: str, method: str, path: str, body: Optional[dict] = None):

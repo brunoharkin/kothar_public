@@ -19,8 +19,8 @@ description: >-
 
 2. **Detecção de Retomada (Handoff Ativo):**
    - O sistema de carregamento de contexto (`kothar-context-loader.sh`) deve buscar se existe o arquivo `00_Memoria/Snapshots/handoff-ativo.md` na raiz do projeto selecionado.
-   - **Se o Handoff estiver ativo:** O contexto injetado no LLM deve ser restrito exclusivamente aos metadados do projeto, ao conteúdo de `handoff-ativo.md` e a esta skill. O `prompt-principal.md` completo e as buscas ChromaDB devem ser **ignoradas**, economizando até 15.000 tokens e prevenindo lentidão e estouros de janela de contexto.
+   - **Se o Handoff estiver ativo:** Carregar metadados, handoff, instruções vigentes, contrato de entrega e habilidades obrigatórias da próxima ação. Consultar contexto adicional apenas quando necessário. O snapshot não substitui políticas nem autoriza omitir segurança.
    - **Se for Início Fresco:** O fluxo normal de bootstrap do Kothar (prompt-principal + buscas ChromaDB) deve ser executado para fornecer ao agente todas as regras essenciais.
 
 3. **Prevenção de Fadiga de Contexto:**
-   - O agente está terminantemente **proibido** de re-ler arquivos markdown estruturais de documentação global (como `prompt-principal.md`, `manual-operacional.md`, `gates.md` ou `checkpoints.md`) durante uma conversa de retomada, pois as regras de negócio e de sandbox já foram injetadas. Toda a memória de trabalho deve ser recuperada a partir do snapshot consolidado.
+   - Evitar releituras sem finalidade. Reler regras/habilidades quando a tarefa, versão ou contexto mudar. Preservar a baseline de segurança e `auto-relatabilidade`; o relatório final lista apenas uso real da interação atual.

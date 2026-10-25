@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * Kothar Memory Inspector API v6.0 SUPREMO (ALINHADO)
  * Mapeamento completo do cofre, RAG em tempo real, análise avançada
@@ -198,7 +199,7 @@ export interface DashboardData {
 const BASE = '/api';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await apiFetch(`${BASE}${path}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options?.headers },
   });

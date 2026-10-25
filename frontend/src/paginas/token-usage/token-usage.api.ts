@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * KOTHAR — Token Usage API Client
  * Consome endpoints REST do backend/token_counter
@@ -63,7 +64,7 @@ export interface StatusResponse {
 }
 
 async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, init);
+  const res = await apiFetch(url, init);
   if (!res.ok) throw new Error(`HTTP ${res.status} em ${url}`);
   return res.json();
 }

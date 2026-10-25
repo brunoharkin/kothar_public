@@ -8,6 +8,7 @@
 """
 
 import subprocess
+import re
 from typing import Any
 
 from backend.agents.base_agent import BaseAgent
@@ -47,11 +48,14 @@ class DevOpsAgent(BaseAgent):
                 self.session_id, self.agent_name, "check_port",
                 tool_input={"port": port}
             ) as span:
+                if not isinstance(port, int) or not 1 <= port <= 65535:
+                    results[str(port)] = "invalida"
+                    continue
                 proc = subprocess.run(
-                    f"lsof -i :{port} || echo 'LIVRE'",
-                    shell=True, capture_output=True, text=True
+                    ["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN"],
+                    capture_output=True, text=True, timeout=10
                 )
-                is_free = "LIVRE" in proc.stdout or proc.stdout.strip() == ""
+                is_free = proc.returncode == 1 and not proc.stdout.strip()
                 results[str(port)] = "livre" if is_free else "em_uso"
                 span["output"] = {"port": port, "status": results[str(port)]}
 
@@ -67,8 +71,8 @@ class DevOpsAgent(BaseAgent):
             self.session_id, self.agent_name, "docker_ps"
         ) as span:
             proc = subprocess.run(
-                "docker ps --filter name=kothar --format '{{.Names}}|{{.Status}}|{{.Ports}}'",
-                shell=True, capture_output=True, text=True
+                ["docker", "ps", "--filter", "name=kothar", "--format", "{{.Names}}|{{.Status}}|{{.Ports}}"],
+                capture_output=True, text=True, timeout=15
             )
             containers = []
             for line in proc.stdout.strip().splitlines():
@@ -80,12 +84,14 @@ class DevOpsAgent(BaseAgent):
 
     async def _restart_service(self, service: str) -> dict[str, Any]:
         """Reinicia um container Docker."""
+        if not re.fullmatch(r"kothar[_-][a-zA-Z0-9_.-]{1,80}", service):
+            return {"status": "blocked", "agent": self.agent_name, "error": "Serviço fora da allowlist Kothar"}
         async with trace_recorder.trace_tool(
             self.session_id, self.agent_name, "docker_restart",
             tool_input={"service": service}
         ) as span:
             proc = subprocess.run(
-                f"docker restart {service}", shell=True, capture_output=True, text=True
+                ["docker", "restart", service], capture_output=True, text=True, timeout=30
             )
             span["output"] = {"returncode": proc.returncode, "output": proc.stdout}
         return {"status": "done", "agent": self.agent_name, "service": service, "returncode": proc.returncode}

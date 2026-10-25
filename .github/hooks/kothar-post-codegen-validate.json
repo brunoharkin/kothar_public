@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "ROOT=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}\"; bash \"$ROOT/hooks/post-codegen-validate.sh\"",
+            "command": "ROOT=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}\"; KOTHAR_PROJECT_DIR=\"$ROOT\" python3 \"$ROOT/hooks/post-codegen-validate.py\"",
             "timeout": 20
           }
         ]

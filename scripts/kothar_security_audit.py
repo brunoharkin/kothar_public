@@ -79,6 +79,9 @@ EXEMPT_PATTERNS = [
     r'\.env\.example$',
     r'migrations/',
     r'seeders/',
+    r'\.system_generated/',
+    r'^skills/',
+    r'/\.agents/skills/',
 ]
 
 # Extensões de arquivo para auditar
@@ -112,44 +115,21 @@ class SecurityAuditor:
         # Verificar extensão
         return file_path.suffix in AUDIT_EXTENSIONS
 
+    def audit_content(self, file_path: Path, content: str) -> None:
+        """Inspect supplied text without retaining matched secrets."""
+        self.files_audited += 1
+        for line_num, line in enumerate(content.splitlines(), 1):
+            for severity, patterns in [('CRITICAL', CRITICAL_PATTERNS), ('HIGH', HIGH_PATTERNS)]:
+                for pattern, description in patterns:
+                    if re.search(pattern, line, re.IGNORECASE):
+                        self.violations.append({
+                            'file': str(file_path), 'line': line_num,
+                            'type': severity, 'description': description,
+                        })
+
     def audit_file(self, file_path: Path) -> None:
-        """Audita um arquivo específico."""
-        try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read()
-                lines = content.split('\n')
-
-            self.files_audited += 1
-
-            # Verificar padrões críticos
-            for line_num, line in enumerate(lines, 1):
-                # Ignorar comentários e strings em arquivos de exemplo
-                if '.env.example' in str(file_path) or 'sample' in str(file_path):
-                    continue
-
-                for pattern, description in CRITICAL_PATTERNS:
-                    if re.search(pattern, line, re.IGNORECASE):
-                        self.violations.append({
-                            'file': str(file_path),
-                            'line': line_num,
-                            'type': 'CRITICAL',
-                            'description': description,
-                            'code': line.strip()[:100]
-                        })
-
-                # Verificar padrões altos
-                for pattern, description in HIGH_PATTERNS:
-                    if re.search(pattern, line, re.IGNORECASE):
-                        self.violations.append({
-                            'file': str(file_path),
-                            'line': line_num,
-                            'type': 'HIGH',
-                            'description': description,
-                            'code': line.strip()[:100]
-                        })
-
-        except Exception as e:
-            print(f"  ⚠️ Erro ao auditar {file_path}: {e}")
+        """Read errors must propagate instead of becoming an approval."""
+        self.audit_content(file_path, file_path.read_text(encoding='utf-8'))
 
     def audit_directory(self, directory: Path) -> None:
         """Audita um diretório recursivamente."""
@@ -203,7 +183,7 @@ class SecurityAuditor:
                 print(f"\n⚠️ {v['description']}")
                 print(f"   📁 {v['file']}")
                 print(f"   📍 Linha {v['line']}")
-                print(f"   📝 {v['code']}")
+                print('   Conteúdo omitido para proteger dados sensíveis.')
 
         if high:
             print("\n" + "=" * 60)
@@ -226,7 +206,11 @@ class SecurityAuditor:
 
     def _save_report(self) -> None:
         """Salva relatório de auditoria."""
-        report_dir = Path("/home/bruno/cofre/auditorias")
+        cofre_path = Path("/home/bruno-harkin/Cofre/auditorias")
+        if not cofre_path.parent.exists():
+            report_dir = Path("/home/bruno-harkin/kothar/.system_generated/auditorias")
+        else:
+            report_dir = cofre_path
         report_dir.mkdir(parents=True, exist_ok=True)
 
         from datetime import datetime
@@ -255,47 +239,43 @@ class SecurityAuditor:
 # ============================================================
 
 def run_pre_commit_hook():
-    """Executa auditoria antes do commit."""
-    # Pega arquivos staged
+    """Scan immutable index blobs, never their worktree replacements."""
     import subprocess
 
     try:
+        root = subprocess.run(
+            ['git', 'rev-parse', '--show-toplevel'], check=True,
+            capture_output=True, text=True,
+        ).stdout.strip()
         result = subprocess.run(
-            ['git', 'diff', '--cached', '--name-only', '--diff-filter=ACM'],
-            capture_output=True, text=True, cwd='/home/bruno/kothar'
+            ['git', 'diff', '--cached', '--name-only', '-z', '--diff-filter=ACMRT'],
+            cwd=root, capture_output=True, check=True,
         )
-        files = result.stdout.strip().split('\n')
-    except Exception as e:
-        print(f"⚠️ Erro ao obter arquivos staged: {e}")
+        files = [name for name in result.stdout.split(b'\0') if name]
+        auditor = SecurityAuditor(root)
+        for raw_name in files:
+            name = os.fsdecode(raw_name)
+            path = Path(name)
+            # Production env files are blocked even though the legacy scanner exempts them.
+            if path.name == '.env' or (path.name.startswith('.env.') and path.name not in {'.env.example', '.env.sample'}):
+                print('BLOQUEADO: arquivo de ambiente no índice.')
+                return 1
+            # Do not apply directory/name exemptions to tracked staged source files.
+            if path.suffix not in AUDIT_EXTENSIONS:
+                continue
+            blob = subprocess.run(
+                ['git', 'show', ':' + name], cwd=root,
+                capture_output=True, check=True,
+            ).stdout
+            auditor.audit_content(path, blob.decode('utf-8', errors='strict'))
+        if auditor.violations:
+            print(f'BLOQUEADO: {len(auditor.violations)} achados no índice; valores omitidos.')
+            return 1
+        print(f'Scanner limitado: {auditor.files_audited} arquivos de código no índice; não certifica produção.')
         return 0
-
-    if not files or files == ['']:
-        print("Nenhum arquivo para auditar.")
-        return 0
-
-    print(f"\n📁 Arquivos para auditar: {len(files)}")
-
-    # Auditar cada arquivo
-    auditor = SecurityAuditor('/home/bruno/kothar')
-    all_clean = True
-
-    for file in files:
-        if file:
-            file_path = Path('/home/bruno/kothar') / file
-            if file_path.exists() and auditor.should_audit(file_path):
-                auditor.audit_file(file_path)
-
-    # Resultado
-    if not auditor.violations:
-        print("\n✅ TODOS OS ARQUIVOS APROVADOS")
-        return 0
-
-    print(f"\n🚨 {len(auditor.violations)} VIOLAÇÕES ENCONTRADAS")
-    print("❌ COMMIT BLOQUEADO")
-    print("\nCorrija as violações antes de commitar.")
-    print("Ou use --no-verify para pular (NÃO RECOMENDADO)")
-
-    return 1
+    except (OSError, subprocess.SubprocessError, UnicodeError):
+        print('BLOQUEADO: não foi possível verificar o índice Git; detalhes omitidos.')
+        return 2
 
 
 # ============================================================

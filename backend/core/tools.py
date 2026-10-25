@@ -25,6 +25,15 @@ ALLOWED_DIRS = [
     PROJECT_ROOT,
 ]
 
+SENSITIVE_PARTS = frozenset({
+    ".git", ".aws", ".ssh", ".gnupg", "secrets", "credentials", "vault",
+    "node_modules", "__pycache__",
+})
+SENSITIVE_NAMES = frozenset({
+    ".env", ".env.local", ".env.production", "id_rsa", "id_ed25519",
+    "credentials.json", "service-account.json", "token.json",
+})
+
 MAX_FILE_SIZE = 200_000  # 200KB max por arquivo
 MAX_SEARCH_RESULTS = 30
 
@@ -33,6 +42,11 @@ def _is_path_allowed(path: str) -> bool:
     """Verifica se o path está dentro de algum diretório permitido."""
     try:
         p = Path(path).resolve()
+        lowered_parts = {part.lower() for part in p.parts}
+        if lowered_parts & SENSITIVE_PARTS or p.name.lower() in SENSITIVE_NAMES:
+            return False
+        if p.suffix.lower() in {".pem", ".key", ".p12", ".pfx"}:
+            return False
         for allowed in ALLOWED_DIRS:
             if not allowed.exists():
                 continue
@@ -103,7 +117,7 @@ def tool_list_dir(path: str, pattern: str = "*") -> Dict:
 
         items = []
         for f in p.rglob(pattern):
-            if f.is_file():
+            if f.is_file() and _is_path_allowed(str(f)):
                 items.append({
                     "path": str(f),
                     "name": f.name,
@@ -136,7 +150,7 @@ def tool_search_files(
     try:
         matches = []
         for f in base.rglob(pattern):
-            if f.is_file():
+            if f.is_file() and _is_path_allowed(str(f)):
                 matches.append({
                     "path": str(f),
                     "name": f.name,
@@ -169,7 +183,7 @@ def tool_search_code(
         q_lower = query.lower()
         matches = []
         for f in base.rglob(glob):
-            if not f.is_file() or f.stat().st_size > MAX_FILE_SIZE:
+            if not f.is_file() or not _is_path_allowed(str(f)) or f.stat().st_size > MAX_FILE_SIZE:
                 continue
             try:
                 content = f.read_text(encoding="utf-8", errors="ignore")

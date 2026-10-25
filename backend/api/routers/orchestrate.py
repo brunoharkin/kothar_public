@@ -1,30 +1,67 @@
 """Orchestration router."""
 
-from fastapi import APIRouter, BackgroundTasks
-from fastapi.responses import JSONResponse
 
+from fastapi import APIRouter, BackgroundTasks
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
+from pydantic import BaseModel, ConfigDict, Field
+
+from backend.contracts.task_execution import TaskExecutionPlan
 from backend.core.logger import get_logger
-from backend.trace.session_compiler import session_compiler
 from backend.engenheiro_kothar.orchestrator import engenheiro_kothar
-from backend.harness.blueprint_executor import blueprint_executor
+from backend.engenheiro_kothar.routing import TaskRequirements
+from backend.trace.session_compiler import session_compiler
 
 log = get_logger("api.orchestrate")
-router = APIRouter()
+
+
+class SafeValidationRoute(APIRoute):
+    """Erros de contrato não devolvem conteúdo de arquivos ou credenciais."""
+
+    def get_route_handler(self):
+        handler = super().get_route_handler()
+
+        async def safe_handler(request):
+            try:
+                return await handler(request)
+            except RequestValidationError as exc:
+                return JSONResponse(status_code=422, content={"detail": [
+                    {"loc": error["loc"], "type": error["type"],
+                     "msg": "Requisição inválida para o contrato de orquestração."}
+                    for error in exc.errors()
+                ]})
+
+        return safe_handler
+
+
+router = APIRouter(route_class=SafeValidationRoute)
+
+
+class StartRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    task_description: str = Field(min_length=1, max_length=20_000)
+    metadata: dict = Field(default_factory=dict)
+    requirements: TaskRequirements | None = None
+    execution_plan: TaskExecutionPlan | None = None
+
+
+class CompileRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    session_id: str = Field(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9_-]+$")
 
 
 @router.post("/start")
-async def start_orchestration(body: dict):
+async def start_orchestration(body: StartRequest):
     """
     Inicia uma nova orquestração.
     Cria blueprint mas NÃO executa - use /execute para rodar.
     """
-    task = body.get("task_description", "")
-    if not task:
-        return JSONResponse(status_code=422, content={"error": "task_description é obrigatório"})
-
     result = await engenheiro_kothar.orchestrate(
-        task_description=task,
-        metadata=body.get("metadata", {}),
+        task_description=body.task_description,
+        metadata=body.metadata,
+        requirements=body.requirements,
+        execution_plan=body.execution_plan,
     )
     return result
 
@@ -43,11 +80,13 @@ async def execute_blueprint(session_id: str):
         return {
             "session_id": session_id,
             "status": result.status,
+            "error": result.error,
             "completed_steps": result.completed_steps,
             "failed_steps": result.failed_steps,
             "skipped_steps": result.skipped_steps,
             "total_duration_ms": result.total_duration_ms,
             "checkpoint_recovered": result.checkpoint_recovered,
+            "production_ready": result.production_ready,
             "step_results": [
                 {
                     "step_id": r.step_id,
@@ -84,8 +123,8 @@ async def execute_blueprint_background(session_id: str, background_tasks: Backgr
 
     return {
         "session_id": session_id,
-        "status": "executing",
-        "message": "Execução iniciada em background. Use /status para monitorar.",
+        "status": "accepted",
+        "message": "Solicitação aceita. Execução depende de executor real; consulte /status.",
     }
 
 
@@ -104,11 +143,7 @@ async def get_orchestration_status(session_id: str):
 
 
 @router.post("/compile")
-async def compile_session(body: dict):
+async def compile_session(body: CompileRequest):
     """Compila uma sessão e gera relatório no Vault."""
-    session_id = body.get("session_id")
-    if not session_id:
-        return JSONResponse(status_code=422, content={"error": "session_id é obrigatório"})
-
-    result = await session_compiler.compile(session_id)
+    result = await session_compiler.compile(body.session_id)
     return result

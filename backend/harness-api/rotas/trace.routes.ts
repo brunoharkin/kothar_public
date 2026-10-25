@@ -152,6 +152,9 @@ router.post('/batch', async (req: Request, res: Response) => {
 // DELETE /api/trace/:sessionId — limpar traces de uma sessão (sem apagar a sessão)
 router.delete('/:sessionId', async (req: Request, res: Response) => {
   const sessionId = req.params.sessionId;
+  if (typeof sessionId !== 'string' || !/^[0-9a-f-]{36}$/i.test(sessionId)) {
+    return res.status(400).json({ error: 'Identificador inválido' });
+  }
   if (!(await obterSessao(sessionId))) {
     return res.status(404).json({ error: 'Sessão não encontrada' });
   }

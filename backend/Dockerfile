@@ -16,18 +16,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Codebase Memory MCP
-RUN curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash \
-    && mv /root/.local/bin/codebase-memory-mcp /usr/local/bin/ \
-    && chmod +x /usr/local/bin/codebase-memory-mcp
-
 # Dependências Python
-COPY requirements.txt .
+COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 # Código da aplicação
-COPY . .
+COPY . /app/backend
+
+RUN addgroup --system kothar \
+    && adduser --system --ingroup kothar --home /home/kothar kothar \
+    && mkdir -p /data/cofre_rw \
+    && chown -R kothar:kothar /data /app
+
+USER kothar
 
 # Porta
 EXPOSE 8080

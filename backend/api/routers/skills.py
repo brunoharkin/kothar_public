@@ -4,6 +4,7 @@ import uuid
 
 from fastapi import APIRouter, Query
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import desc, select
 
 from backend.core.database import get_db_session
@@ -12,6 +13,16 @@ from backend.trace.models import Skill
 
 log = get_logger("api.skills")
 router = APIRouter()
+
+
+class SkillCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(min_length=1, max_length=100, pattern=r"^[a-z0-9][a-z0-9-]*$")
+    description: str | None = Field(default=None, max_length=4_000)
+    yaml_content: str = Field(min_length=1, max_length=256_000)
+    category: str | None = Field(default=None, max_length=100)
+    tags: list[str] = Field(default_factory=list, max_length=50)
+    forged_by: str | None = Field(default=None, max_length=100)
 
 
 @router.get("/")
@@ -31,16 +42,12 @@ async def list_skills(
 
 
 @router.post("/")
-async def create_skill(body: dict):
+async def create_skill(body: SkillCreate):
     """Cristaliza uma nova skill."""
     async with get_db_session() as db:
         skill = Skill(
-            name=body["name"],
-            description=body.get("description"),
-            yaml_content=body["yaml_content"],
-            category=body.get("category"),
-            tags=body.get("tags", []),
-            forged_by=body.get("forged_by"),
+            name=body.name, description=body.description, yaml_content=body.yaml_content,
+            category=body.category, tags=body.tags, forged_by=body.forged_by,
         )
         db.add(skill)
         await db.flush()

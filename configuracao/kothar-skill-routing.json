@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {"keywords": ["bug", "erro", "corrigir", "falha"], "skills": ["kothar-debug", "kothar-anti-amnesia"], "required": true},
+    {"security_surface": "authentication", "keywords": ["autenticação", "autenticar", "auth", "login", "logout", "sessão", "sessões", "credenciais", "credencial", "senha", "token", "oauth"], "skills": ["kothar-seguranca", "gate-producao", "gate-seguranca-credenciais"], "required": true},
+    {"security_surface": "user_input_api", "keywords": ["api", "endpoint", "rota pública", "entrada de usuário", "entrada do usuário", "dados do usuário", "formulário", "webhook", "payload"], "skills": ["kothar-seguranca", "gate-producao"], "required": true},
+    {"security_surface": "persistence", "keywords": ["banco de dados", "persistência", "persistir", "persistido", "armazenar", "postgres", "postgresql", "redis", "sqlite", "database", "memória", "checkpoint"], "skills": ["kothar-seguranca", "gate-producao"], "required": true},
+    {"security_surface": "external_api", "keywords": ["api externa", "api de terceiros", "serviço externo", "serviços externos", "integração externa"], "skills": ["kothar-seguranca", "gate-seguranca-credenciais"], "required": true},
+    {"security_surface": "logging_tracing", "keywords": ["log", "logs", "logging", "trace", "traces", "tracing", "rastreamento"], "skills": ["kothar-seguranca", "structured-logging"], "required": true},
+    {"security_surface": "deployment", "keywords": ["deploy", "produção", "implantação", "publicar aplicação"], "skills": ["gate-producao", "gate-seguranca-credenciais"], "required": true},
+    {"keywords": ["whatsapp", "agente conversacional", "llm", "rag", "avaliação de agentes"], "skills": ["engenharia-de-ia-producao"], "required": true},
+    {"security_surface": "whatsapp_agent", "keywords": ["whatsapp", "agente conversacional"], "skills": ["harness-whatsapp", "kothar-seguranca", "gate-producao"], "required": true}
+  ]
+}

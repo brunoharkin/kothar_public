@@ -9,12 +9,18 @@ let poolInstance: Pool | null = null;
 
 export async function initDB(): Promise<void> {
   if (!poolInstance) {
+    const required = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'] as const;
+    for (const name of required) {
+      if (!process.env[name]) throw new Error(`Configuração obrigatória ausente: ${name}`);
+    }
+    const port = Number(process.env.DB_PORT || '5432');
+    if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('DB_PORT inválida');
     poolInstance = new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5444', 10),
-      user: process.env.DB_USER || 'kothar',
-      password: process.env.DB_PASSWORD || 'kothar_trace_pwd',
-      database: process.env.DB_NAME || 'traces',
+      host: process.env.DB_HOST,
+      port,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
     });
 
     await runMigrations(poolInstance);
@@ -70,7 +76,7 @@ async function runMigrations(pool: Pool) {
         console.log(`[migrations] Aplicada: ${file}`);
       } catch (err) {
         await client.query('ROLLBACK');
-        console.error(`[migrations] Erro na migration ${file}:`, err);
+        console.error(`[migrations] Falha ao aplicar ${file}`);
         throw err;
       }
     }

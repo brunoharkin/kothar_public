@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "policy_id": "kothar-production-security",
+  "policy_version": "2026-10-17.1",
+  "default_environment": "production",
+  "fail_closed": true,
+  "surfaces": {
+    "authentication": ["kothar-seguranca", "gate-producao", "gate-seguranca-credenciais"],
+    "user_input_api": ["kothar-seguranca", "gate-producao"],
+    "persistence": ["kothar-seguranca", "gate-producao"],
+    "external_api": ["kothar-seguranca", "gate-seguranca-credenciais"],
+    "deployment": ["gate-producao", "gate-seguranca-credenciais"],
+    "logging_tracing": ["kothar-seguranca", "structured-logging"],
+    "whatsapp_agent": ["harness-whatsapp", "kothar-seguranca", "gate-producao"]
+  },
+  "release_requirements": [
+    "artifact_identity",
+    "independent_verifier",
+    "credential_scan",
+    "behavioral_security_tests",
+    "production_gate",
+    "rollback_evidence"
+  ],
+  "prohibited_authorities": [
+    "browser_web_storage_auth",
+    "process_memory_security_state",
+    "unverified_agent_boolean",
+    "mutable_json_attestation"
+  ]
+}

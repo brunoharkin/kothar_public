@@ -22,6 +22,9 @@ Antes de criar código, produzir um mini contrato visual:
 
 Referências externas servem para orientar processo. Não substituem a identidade
 visual, os tokens ou as decisões aprovadas do projeto.
+Para referências de layout moderno, bento grids, micro-interações e motion design,
+consulte obrigatoriamente a skill `motionsites` (MCP MotionSites + banco de referências em
+`.agents/skills/motionsites/referencias/`).
 
 ## 0.1 Anti-interface-genérica
 

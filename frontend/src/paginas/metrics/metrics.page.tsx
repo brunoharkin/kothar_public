@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import {
   Activity, AlertTriangle, CheckCircle2, Database, HardDrive,
   Server, Timer, XCircle, Brain, Zap, Clock, TrendingUp,
-  TrendingDown, Minus, RefreshCw, Eye, Cpu, MemoryStick
+  TrendingDown, Minus, RefreshCw, Eye, MemoryStick
 } from 'lucide-react';
 import {
   getDashboard,

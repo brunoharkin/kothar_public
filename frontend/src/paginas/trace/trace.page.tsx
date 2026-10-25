@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * KOTHAR v6.0 — Trace Page (SUPREMO + TURBINADO)
  *
@@ -28,6 +29,7 @@ import {
   deleteSession,
   clearSessionTraces,
   markTraceAsError,
+  loadMarkedErrors,
   getMarkedErrors,
   countErrorsByType,
   classifyTokensByCategory,
@@ -283,7 +285,7 @@ export function TracePage() {
     if (!selectedSessionId) return;
     setLoading(true);
     try {
-      const data = await listTraces(selectedSessionId);
+      const [data] = await Promise.all([listTraces(selectedSessionId), loadMarkedErrors()]);
       const markedIds = new Set(getMarkedErrors(selectedSessionId).map((e) => e.trace_id));
 
       const mapped: any[] = data.map((t) => ({
@@ -497,7 +499,7 @@ export function TracePage() {
       const result = await generateSessionReport(selectedSessionId);
       alert(`✅ Sessão finalizada!\nRelatório gerado: ${result.success ? 'sim' : 'não'}`);
       // Recarrega E força reload das sessões (sem cache)
-      await fetch(`/api/sessions/?limit=50&_t=${Date.now()}`).then((r) => r.json()).then((data) => {
+      await apiFetch(`/api/sessions/?limit=50&_t=${Date.now()}`).then((r) => r.json()).then((data) => {
         if (Array.isArray(data)) setSessions(data);
       });
     } catch (e: any) {

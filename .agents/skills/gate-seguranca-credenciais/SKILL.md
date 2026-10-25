@@ -104,12 +104,8 @@ grep -E "^\.env$" .gitignore && echo "✅ .env ignorado" || echo "❌ .env NÃO 
 5. No deploy, configurar as variáveis no painel do provedor (Vercel, Railway, etc)
 ```
 
-**Exemplo ERRADO:**
-```typescript
-// ❌ NUNCA FAZER ISSO
-const dbUrl = "postgres://user:senha123@host:5432/db"
-const apiKey = "sk-abc123def456ghi789"
-```
+**Proibido:** credencial literal ou URL com usuário/senha embutidos no código.
+Não colocar valores de credenciais em exemplos; usar nomes de variáveis de ambiente.
 
 **Exemplo CERTO:**
 ```typescript

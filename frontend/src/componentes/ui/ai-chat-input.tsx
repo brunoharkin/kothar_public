@@ -3,10 +3,6 @@ import {
     Command,
     Paperclip,
     ArrowUp,
-    Code2,
-    Cpu,
-    Sparkles,
-    Terminal,
     CornerDownLeft,
     Loader2
 } from "lucide-react";
@@ -28,7 +24,7 @@ interface AIChatInputProps {
   modelName: string;
 }
 
-export const AIChatInput = ({ value, onChange, onSubmit, isLoading, disabled, modelName }: AIChatInputProps) => {
+export const AIChatInput = ({ value, onChange, onSubmit, isLoading, disabled }: AIChatInputProps) => {
     const [promptIndex, setPromptIndex] = useState(0);
     const [isExpanded, setIsExpanded] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);

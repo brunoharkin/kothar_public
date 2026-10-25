@@ -10,6 +10,7 @@ import json
 import time
 import asyncio
 import logging
+import re
 from pathlib import Path
 from typing import List, Dict, Optional
 
@@ -35,6 +36,8 @@ class ConversationMemory:
     """Memória persistente de conversa com sumarização."""
 
     def __init__(self, session_id: str):
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", session_id):
+            raise ValueError("session_id inválido")
         self.session_id = session_id
         self.memory_file = MEMORY_DIR / f"{session_id}.json"
         self.summary_file = MEMORY_DIR / f"{session_id}_summary.md"

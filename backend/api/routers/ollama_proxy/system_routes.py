@@ -73,7 +73,7 @@ async def proxy_status():
 async def proxy_models_friendly():
     """
     Lista modelos (formato amigável).
-    Aceita ?ollama_url= para URL customizada.
+    O destino é definido exclusivamente no servidor.
     """
     # Pega URL customizada do query param ou usa a padrão
     from fastapi import Request
@@ -83,10 +83,8 @@ async def proxy_models_friendly():
 
 @router.get("/proxy/tags")
 async def proxy_tags_custom(request: Request):
-    """Lista modelos do Ollama via proxy. Aceita ?ollama_url=...&ollama_base=..."""
-    ollama_url = request.query_params.get("ollama_url")
-    ollama_base = request.query_params.get("ollama_base")
-    target_url = ollama_url or ollama_base or OLLAMA_BASE_URL
+    """Lista modelos do Ollama pelo destino interno configurado."""
+    target_url = OLLAMA_BASE_URL
     
     # Se o frontend mandar localhost, redirecionar para o container do Ollama
     if target_url and "localhost" in target_url:

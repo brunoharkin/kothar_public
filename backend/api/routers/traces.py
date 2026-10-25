@@ -4,6 +4,7 @@ import uuid
 
 from fastapi import APIRouter, Query
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import desc, select
 
 from backend.core.database import get_db_session
@@ -11,9 +12,40 @@ from backend.core.logger import get_logger
 from backend.trace.metrics import record_trace
 from backend.trace.trace_recorder import trace_recorder
 from backend.trace.models import Trace
+from backend.core.privacy import REDACTED, safe_metadata
 
 log = get_logger("api.traces")
 router = APIRouter()
+
+
+class TraceInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    session_id: uuid.UUID
+    sequence: int = Field(default=0, ge=0, le=10_000_000)
+    event_type: str = Field(default="unknown", min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_.:-]+$")
+    agent_name: str = Field(default="unknown", min_length=1, max_length=100)
+    content: object | None = None
+    tool_name: str | None = Field(default=None, max_length=100)
+    tool_input: object | None = None
+    tool_output: object | None = None
+    duration_ms: int | None = Field(default=None, ge=0, le=86_400_000)
+    tokens_used: int = Field(default=0, ge=0, le=100_000_000)
+    input_tokens: int | None = Field(default=None, ge=0, le=100_000_000)
+    output_tokens: int | None = Field(default=None, ge=0, le=100_000_000)
+    tokens_input: int | None = Field(default=None, ge=0, le=100_000_000)
+    tokens_output: int | None = Field(default=None, ge=0, le=100_000_000)
+    is_error: bool = False
+    error_message: object | None = None
+    metadata: dict = Field(default_factory=dict)
+
+
+class ThinkingInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    session_id: uuid.UUID
+    agent_name: str = Field(default="unknown", min_length=1, max_length=100)
+    thinking_content: str = Field(default="", max_length=1_000_000)
+    tokens: int = Field(default=0, ge=0, le=100_000_000)
+    metadata: dict = Field(default_factory=dict)
 
 
 @router.get("/")
@@ -39,127 +71,63 @@ async def list_traces(
 
 
 @router.post("/")
-async def record_trace(body: dict):
+async def record_trace(body: TraceInput):
     """Grava um evento de trace."""
     # Aceitar tokens_input/output do hook para granularidade
-    tokens_used = body.get("tokens_used", 0)
-    tokens_in = body.get("input_tokens") or body.get("tokens_input") or 0
-    tokens_out = body.get("output_tokens") or body.get("tokens_output") or 0
+    tokens_used = body.tokens_used
+    tokens_in = body.input_tokens or body.tokens_input or 0
+    tokens_out = body.output_tokens or body.tokens_output or 0
 
     # Se não vier separados, estimar do total
     if tokens_in == 0 and tokens_out == 0 and tokens_used > 0:
         tokens_in = int(tokens_used * 0.3)
         tokens_out = tokens_used - tokens_in
 
-    event_type = body.get("event_type", "unknown")
-
-    # Para eventos de thinking, salvar conteúdo completo (sem limite de truncamento)
-    tool_input = body.get("tool_input")
-    content = body.get("content")
-
-    # Se for thinking e tiver tool_input com thinking, extrair conteúdo completo
-    if event_type == "thinking" and tool_input:
-        if isinstance(tool_input, dict) and "thinking" in tool_input:
-            content = tool_input["thinking"]
-        elif isinstance(tool_input, str):
-            content = tool_input
+    event_type = body.event_type
+    metadata = safe_metadata(body.metadata)
 
     async with get_db_session() as db:
         trace = Trace(
-            session_id=uuid.UUID(body["session_id"]),
-            sequence=body.get("sequence", 0),
+            session_id=body.session_id,
+            sequence=body.sequence,
             event_type=event_type,
-            agent_name=body.get("agent_name", "unknown"),
-            content=content,
-            tool_name=body.get("tool_name"),
-            tool_input=tool_input,
-            tool_output=body.get("tool_output"),
-            duration_ms=body.get("duration_ms"),
+            agent_name=body.agent_name,
+            content=REDACTED if body.content is not None else None,
+            tool_name=body.tool_name,
+            tool_input=REDACTED if body.tool_input is not None else None,
+            tool_output=REDACTED if body.tool_output is not None else None,
+            duration_ms=body.duration_ms,
             tokens_used=tokens_used,
             tokens_input=tokens_in,
             tokens_output=tokens_out,
-            is_error=body.get("is_error", False),
-            error_message=body.get("error_message"),
-            metadata_=body.get("metadata", {}),
+            is_error=body.is_error,
+            error_message=REDACTED if body.error_message is not None else None,
+            metadata_=metadata,
         )
         db.add(trace)
         await db.flush()
-
-        # Emitir evento thinking_captured quando thinking é salvo
-        if event_type == "thinking":
-            thinking_content = content or ""
-            thinking_meta = body.get("metadata", {})
-            thinking_meta["thinking_captured"] = True
-            thinking_meta["thinking_length_chars"] = len(thinking_content)
-            thinking_meta["thinking_length_tokens_est"] = max(1, int(len(thinking_content) / 3.5))
-            thinking_meta["original_event_id"] = str(trace.id)
-
-            captured_trace = Trace(
-                session_id=trace.session_id,
-                sequence=trace.sequence + 1,  # Logo após o thinking
-                event_type="thinking_captured",
-                agent_name=trace.agent_name,
-                content=f"Thinking completo salvo: {len(thinking_content)} chars",
-                tool_name="Claude:thinking",
-                tool_input={"thinking": thinking_content},
-                tokens_used=tokens_used,
-                metadata_=thinking_meta,
-            )
-            db.add(captured_trace)
-            await db.flush()
 
         return _trace_to_dict(trace)
 
 
 @router.post("/thinking")
-async def record_thinking_trace(body: dict):
+async def record_thinking_trace(body: ThinkingInput):
     """Endpoint dedicado para captura de thinking via record_thinking().
 
     Salva o thinking completo sem truncamento e emite thinking_captured.
     """
-    session_id = body.get("session_id")
-    agent_name = body.get("agent_name", "unknown")
-    thinking_content = body.get("thinking_content", "")
-    tokens = body.get("tokens", 0)
-    metadata = body.get("metadata", {})
-
-    if not session_id:
-        return JSONResponse(status_code=400, content={"error": "session_id é obrigatório"})
-
-    # Usar record_thinking() do TraceRecorder - salva SEM truncamento
-    thinking_trace_id = await trace_recorder.record_thinking(
-        session_id=session_id,
-        agent_name=agent_name,
-        thinking_content=thinking_content,
-        tokens=tokens,
-        metadata=metadata,
+    thinking_length = len(body.thinking_content)
+    redacted = TraceInput(
+        session_id=body.session_id, event_type="thinking_captured",
+        agent_name=body.agent_name, content=REDACTED, tokens_used=body.tokens,
+        metadata={"thinking_length_chars": thinking_length,
+                  "thinking_length_tokens_est": max(1, int(thinking_length / 3.5))},
     )
-
-    # Emitir evento thinking_captured via API
-    try:
-        await trace_recorder.record(
-            session_id=session_id,
-            event_type="thinking_captured",
-            agent_name=agent_name,
-            content=f"Thinking completo salvo: {len(thinking_content)} chars",
-            tool_name="Claude:thinking",
-            tool_input={"thinking": thinking_content},
-            tokens_used=tokens,
-            metadata={
-                **metadata,
-                "thinking_captured": True,
-                "thinking_length_chars": len(thinking_content),
-                "thinking_length_tokens_est": max(1, int(len(thinking_content) / 3.5)),
-                "original_thinking_id": thinking_trace_id,
-            },
-        )
-    except Exception as e:
-        log.warning(f"Erro ao gravar thinking_captured: {e}")
-
+    trace = await record_trace(redacted)
     return {
-        "thinking_trace_id": thinking_trace_id,
-        "thinking_length_chars": len(thinking_content),
-        "thinking_length_tokens_est": max(1, int(len(thinking_content) / 3.5)),
+        "thinking_trace_id": trace["id"],
+        "thinking_length_chars": thinking_length,
+        "thinking_length_tokens_est": max(1, int(thinking_length / 3.5)),
     }
 
 

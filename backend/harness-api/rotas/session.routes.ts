@@ -9,6 +9,14 @@ import path from 'path';
 
 const router = Router();
 
+function routeId(req: Request): string {
+  const value = req.params.id;
+  if (typeof value !== 'string' || !/^[0-9a-f-]{36}$/i.test(value)) {
+    throw new Error('Identificador inválido');
+  }
+  return value;
+}
+
 // POST /api/session — criar nova sessão
 router.post('/', async (req: Request, res: Response) => {
   try {
@@ -28,39 +36,42 @@ router.get('/', async (req: Request, res: Response) => {
 
 // GET /api/session/:id — detalhes
 router.get('/:id', async (req: Request, res: Response) => {
-  const session = await sessionService.obterSessao(req.params.id);
+  const session = await sessionService.obterSessao(routeId(req));
   if (!session) return res.status(404).json({ error: 'Sessão não encontrada' });
   res.json(session);
 });
 
 // PUT /api/session/:id — encerrar
 router.put('/:id', async (req: Request, res: Response) => {
-  const session = await sessionService.encerrarSessao(req.params.id);
+  const session = await sessionService.encerrarSessao(routeId(req));
   if (!session) return res.status(404).json({ error: 'Sessão não encontrada ou já encerrada' });
   res.json(session);
 });
 
 // DELETE /api/session/:id — excluir permanentemente (CASCADE remove traces)
 router.delete('/:id', async (req: Request, res: Response) => {
-  const ok = await sessionService.deletarSessao(req.params.id);
+  const id = routeId(req);
+  const ok = await sessionService.deletarSessao(id);
   if (!ok) return res.status(404).json({ error: 'Sessão não encontrada' });
-  res.json({ deleted: true, id: req.params.id });
+  res.json({ deleted: true, id });
 });
 
 // GET /api/session/:id/traces — listar traces (paginado)
 router.get('/:id/traces', async (req: Request, res: Response) => {
-  const session = await sessionService.obterSessao(req.params.id);
+  const id = routeId(req);
+  const session = await sessionService.obterSessao(id);
   if (!session) return res.status(404).json({ error: 'Sessão não encontrada' });
 
   const limit = parseInt((req.query.limit as string) || '500', 10);
   const offset = parseInt((req.query.offset as string) || '0', 10);
-  const traces = await listarTraces(req.params.id, limit, offset);
+  const traces = await listarTraces(id, limit, offset);
   res.json(traces);
 });
 
 // GET /api/session/:id/traces/stream — SSE live
 router.get('/:id/traces/stream', async (req: Request, res: Response) => {
-  const session = await sessionService.obterSessao(req.params.id);
+  const id = routeId(req);
+  const session = await sessionService.obterSessao(id);
   if (!session) return res.status(404).json({ error: 'Sessão não encontrada' });
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -79,12 +90,12 @@ router.get('/:id/traces/stream', async (req: Request, res: Response) => {
     res.write(`event: trace\ndata: ${JSON.stringify(trace)}\n\n`);
   };
 
-  traceEvents.on(`session:${req.params.id}`, onTrace);
+  traceEvents.on(`session:${id}`, onTrace);
 
   // Cleanup no disconnect
   req.on('close', () => {
     clearInterval(keepalive);
-    traceEvents.off(`session:${req.params.id}`, onTrace);
+    traceEvents.off(`session:${id}`, onTrace);
     res.end();
   });
 });
@@ -92,10 +103,11 @@ router.get('/:id/traces/stream', async (req: Request, res: Response) => {
 // POST /api/session/:id/report — gerar relatório Markdown
 router.post('/:id/report', async (req: Request, res: Response) => {
   try {
-    const session = await sessionService.obterSessao(req.params.id);
+    const id = routeId(req);
+    const session = await sessionService.obterSessao(id);
     if (!session) return res.status(404).json({ error: 'Sessão não encontrada' });
 
-    const traces = await listarTraces(req.params.id, 10000, 0);
+    const traces = await listarTraces(id, 10000, 0);
     
     let md = `# Relatório de Sessão: ${session.name || session.id}\n\n`;
     md += `- **Agente**: ${session.agent}\n`;

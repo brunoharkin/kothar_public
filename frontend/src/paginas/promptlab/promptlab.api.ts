@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * Kothar Prompt Lab API
  * Lista system prompts de todos os agentes (incluindo Kothar) e permite testar A/B
@@ -39,8 +40,25 @@ export interface ABTest {
   created_at: string;
 }
 
-const STORAGE_KEY = 'kothar_prompt_variants';
-const STORAGE_KEY_TESTS = 'kothar_ab_tests';
+async function listState<T>(kind: 'prompt_variant' | 'ab_test'): Promise<T[]> {
+  const response = await apiFetch(`/api/workspace-state/${kind}`);
+  if (!response.ok) throw new Error('Não foi possível carregar os dados persistidos');
+  const rows = await response.json();
+  return rows.map((row: { payload: T }) => row.payload);
+}
+
+async function putState<T extends { id: string }>(kind: 'prompt_variant' | 'ab_test', value: T): Promise<void> {
+  const response = await apiFetch(`/api/workspace-state/${kind}/${encodeURIComponent(value.id)}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: value.id, payload: value }),
+  });
+  if (!response.ok) throw new Error('Não foi possível salvar os dados');
+}
+
+async function deleteState(kind: 'prompt_variant' | 'ab_test', id: string): Promise<void> {
+  const response = await apiFetch(`/api/workspace-state/${kind}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!response.ok) throw new Error('Não foi possível excluir os dados');
+}
 
 // System prompts REAIS extraídos dos Modelfiles Ollama
 // (lidos diretamente de /home/bruno/kothar/scripts/native_models/*/Modelfile)
@@ -173,53 +191,34 @@ export const promptLabApi = {
     return KNOWN_PROMPTS;
   },
 
-  // Variantes locais (localStorage)
-  getVariants(): PromptVariant[] {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch {
-      return [];
-    }
+  async getVariants(): Promise<PromptVariant[]> {
+    return listState<PromptVariant>('prompt_variant');
   },
 
-  saveVariant(variant: PromptVariant): void {
-    const variants = this.getVariants();
-    const idx = variants.findIndex((v) => v.id === variant.id);
-    if (idx >= 0) variants[idx] = variant;
-    else variants.push(variant);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(variants));
+  async saveVariant(variant: PromptVariant): Promise<void> {
+    await putState('prompt_variant', variant);
   },
 
-  deleteVariant(id: string): void {
-    const variants = this.getVariants().filter((v) => v.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(variants));
+  async deleteVariant(id: string): Promise<void> {
+    await deleteState('prompt_variant', id);
   },
 
-  getTests(): ABTest[] {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY_TESTS) || '[]');
-    } catch {
-      return [];
-    }
+  async getTests(): Promise<ABTest[]> {
+    return listState<ABTest>('ab_test');
   },
 
-  saveTest(test: ABTest): void {
-    const tests = this.getTests();
-    const idx = tests.findIndex((t) => t.id === test.id);
-    if (idx >= 0) tests[idx] = test;
-    else tests.push(test);
-    localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(tests));
+  async saveTest(test: ABTest): Promise<void> {
+    await putState('ab_test', test);
   },
 
-  deleteTest(id: string): void {
-    const tests = this.getTests().filter((t) => t.id !== id);
-    localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(tests));
+  async deleteTest(id: string): Promise<void> {
+    await deleteState('ab_test', id);
   },
 
   async runVariant(variant: PromptVariant, question: string): Promise<PromptResult> {
     const startTime = Date.now();
     try {
-      const res = await fetch('http://kothar_ollama:11434/api/chat', {
+      const res = await apiFetch('/api/ollama/proxy/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

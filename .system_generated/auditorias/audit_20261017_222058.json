@@ -1,0 +1,827 @@
+{
+  "timestamp": "2026-10-17T22:20:58.206339",
+  "files_audited": 577,
+  "violations": [
+    {
+      "file": "docker-compose.yml",
+      "line": 104,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 151,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 151,
+      "type": "HIGH",
+      "description": "IP:Porta exposto"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 208,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 216,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 216,
+      "type": "HIGH",
+      "description": "IP:Porta exposto"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 231,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 255,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "docker-compose.yml",
+      "line": 289,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 17,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 21,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 25,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 29,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 33,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 37,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 41,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 45,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 49,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 53,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 57,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 61,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 65,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 69,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 73,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 77,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 81,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 85,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 89,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 94,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 99,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 102,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 107,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 112,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 121,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/vite.config.ts",
+      "line": 125,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar-orchestra.sh",
+      "line": 230,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar-orchestra.sh",
+      "line": 230,
+      "type": "HIGH",
+      "description": "IP:Porta exposto"
+    },
+    {
+      "file": "scripts/kothar-orchestra.sh",
+      "line": 231,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar-orchestra.sh",
+      "line": 231,
+      "type": "HIGH",
+      "description": "IP:Porta exposto"
+    },
+    {
+      "file": "scripts/refresh_rag.sh",
+      "line": 43,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/refresh_rag.sh",
+      "line": 55,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/clean_db.sh",
+      "line": 6,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/trace_live.py",
+      "line": 19,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/ide_trace_watcher.py",
+      "line": 11,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/antigravity_tracer.py",
+      "line": 25,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_start.sh",
+      "line": 92,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_start.sh",
+      "line": 128,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_start.sh",
+      "line": 138,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 14,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 32,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 42,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 43,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 44,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 45,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 51,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 52,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 53,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar_full_start.sh",
+      "line": 54,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/start_daemon.sh",
+      "line": 48,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/validar_sessao_google.py",
+      "line": 157,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/colab_gpu_test.sh",
+      "line": 23,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar-cli.sh",
+      "line": 20,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/kothar-cli.sh",
+      "line": 20,
+      "type": "HIGH",
+      "description": "IP:Porta exposto"
+    },
+    {
+      "file": "scripts/colab_gpu_status.sh",
+      "line": 19,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "scripts/gemini_tracer.py",
+      "line": 10,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "cli/kothar.sh",
+      "line": 13,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "cli/kothar.sh",
+      "line": 124,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 38,
+      "type": "CRITICAL",
+      "description": "API Key hardcoded"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 55,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 56,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 57,
+      "type": "HIGH",
+      "description": "sessionStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 71,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 155,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 156,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 159,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 160,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 180,
+      "type": "CRITICAL",
+      "description": "API Key hardcoded"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 191,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar-security-guardian.yaml",
+      "line": 202,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar-audit.yaml",
+      "line": 121,
+      "type": "CRITICAL",
+      "description": "API Key hardcoded"
+    },
+    {
+      "file": "skills/kothar-audit.yaml",
+      "line": 122,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar-audit.yaml",
+      "line": 123,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar-frontend-audit.yaml",
+      "line": 134,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 44,
+      "type": "CRITICAL",
+      "description": "API Key hardcoded"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 61,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 62,
+      "type": "HIGH",
+      "description": "sessionStorage para dados sensíveis"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 78,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 80,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 159,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 160,
+      "type": "CRITICAL",
+      "description": "Console log com dado sensível"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 185,
+      "type": "CRITICAL",
+      "description": "API Key hardcoded"
+    },
+    {
+      "file": "skills/kothar.yaml",
+      "line": 206,
+      "type": "CRITICAL",
+      "description": "localStorage para dados sensíveis"
+    },
+    {
+      "file": "hooks/claude_hook.py",
+      "line": 27,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "hooks/agy-rag-preload.py",
+      "line": 27,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "hooks/gemini_hook.py",
+      "line": 24,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "hooks/seed_memory_rag.py",
+      "line": 19,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "hooks/memory_rag_tracker.py",
+      "line": 19,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "hooks/skill_indexer.py",
+      "line": 22,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/src/paginas/ollama/build_finetune_dataset.py",
+      "line": 177,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/src/paginas/ollama/build_finetune_dataset.py",
+      "line": 302,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/src/paginas/trace/controle_de_temperatura.page.tsx",
+      "line": 39,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/src/paginas/trace/controle_de_temperatura.page.tsx",
+      "line": 40,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/src/paginas/trace/controle_de_temperatura.page.tsx",
+      "line": 41,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "frontend/src/paginas/trace/controle_de_temperatura.page.tsx",
+      "line": 42,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/harness/step_validator.py",
+      "line": 19,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "backend/core/memory.py",
+      "line": 32,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/core/cascade_executor.py",
+      "line": 330,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/core/cascade_executor.py",
+      "line": 439,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/core/rag_v2.py",
+      "line": 18,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/mcp_server/meta_tools.py",
+      "line": 32,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/mcp_server/linkedin_tools.py",
+      "line": 30,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/mcp_server/trace_interceptor.py",
+      "line": 8,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/decisor/sistema_um.py",
+      "line": 48,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/servicos/comunicacao_meta/gerenciador_meta.py",
+      "line": 78,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/servicos/comunicacao_linkedin/gerenciador_linkedin.py",
+      "line": 71,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/servicos/comunicacao_linkedin/gerenciador_linkedin.py",
+      "line": 200,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/api/routers/autenticacao_meta.py",
+      "line": 57,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/api/routers/autenticacao_meta.py",
+      "line": 259,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "backend/api/routers/autenticacao_google.py",
+      "line": 53,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/api/routers/autenticacao_linkedin.py",
+      "line": 53,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/api/routers/vault_inspector.py",
+      "line": 297,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/api/routers/vault_inspector.py",
+      "line": 357,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/api/routers/vault_inspector.py",
+      "line": 366,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "backend/harness-api/rotas/trace.routes.ts",
+      "line": 35,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "scripts/browser-daemon/agent-browser.sh",
+      "line": 6,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/frontend/kothar_heatmap_tracker.js",
+      "line": 11,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/global/mandatory_self_verification.yaml",
+      "line": 86,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/global/mandatory_self_verification.yaml",
+      "line": 87,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/global/mandatory_self_verification.yaml",
+      "line": 88,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/global/mandatory_self_verification.yaml",
+      "line": 104,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/pocock/engineering/wizard/template.sh",
+      "line": 91,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "skills/pocock/engineering/wizard/template.sh",
+      "line": 128,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "skills/pocock/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh",
+      "line": 13,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "skills/pocock/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh",
+      "line": 34,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "skills/watch/scripts/setup.py",
+      "line": 46,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    },
+    {
+      "file": "skills/watch/scripts/setup.py",
+      "line": 47,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    }
+  ],
+  "summary": {
+    "total": 136,
+    "critical": 23,
+    "high": 113
+  }
+}

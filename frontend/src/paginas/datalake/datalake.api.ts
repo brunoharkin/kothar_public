@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 /**
  * Kothar Data Lake API v6.0 SUPREMO (ALINHADO + TURBINADO)
  * Conecta com Codebase Memory MCP + Data Lake (PostgreSQL + Neo4j)
@@ -94,7 +95,7 @@ const CBM_BASE = '/api/cbm';
 const KOTHAR_BASE = '/api';
 
 async function request<T>(url: string): Promise<T> {
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`HTTP ${res.status}: ${text.substring(0, 100)}`);

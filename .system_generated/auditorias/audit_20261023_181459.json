@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-10-23T18:14:59.470091",
+  "files_audited": 5,
+  "violations": [
+    {
+      "file": "/home/bruno-harkin/kothar/ferramentas/leitor-voz-ptbr/instalar-servico.sh",
+      "line": 23,
+      "type": "HIGH",
+      "description": "Porta interna exposta"
+    },
+    {
+      "file": "/home/bruno-harkin/kothar/ferramentas/leitor-voz-ptbr/edge-engine.js",
+      "line": 24,
+      "type": "HIGH",
+      "description": "Comentário com segredo"
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "critical": 0,
+    "high": 2
+  }
+}

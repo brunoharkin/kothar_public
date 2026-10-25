@@ -1,16 +1,17 @@
-FROM node:20-alpine
+FROM node:22-alpine AS build
 WORKDIR /app
-
-# Instala sqlite3 dependencies if needed for sqlite3 package
-RUN apk add --no-cache python3 make g++ 
-
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
-
+RUN npm ci
 COPY . .
+RUN npm run build && npm prune --omit=dev
 
-# Run typescript build or ts-node (assume ts-node since there's no dist in migrations usually, but let's check if it builds or runs with ts-node)
-# Harness api uses ts-node for servidor-principal.ts
+FROM node:22-alpine AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/banco/migrations ./dist/banco/migrations
 EXPOSE 3000
-
-CMD ["npx", "ts-node", "servidor-principal.ts"]
+USER node
+CMD ["node", "dist/servidor-principal.js"]

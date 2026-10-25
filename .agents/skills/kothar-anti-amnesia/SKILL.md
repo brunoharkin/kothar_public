@@ -25,10 +25,17 @@ Antes de modificar ou reescrever qualquer bloco de código:
    - O Schema do Banco de Dados (DB)
    E garantir que a exata mesma nomenclatura foi usada em todos.
 
-## 3. Workflow de Prevenção:
+## 3. Workflow de Prevenção (Graph-First & Zero-Dump):
 ```
-1. AUDITORIA PROFUNDA: Use `grep` e buscas textuais para encontrar TODOS os lugares onde o nome antigo aparece antes de deletar ou alterar.
-2. EXTRAÇÃO: Liste as funções que estão dentro do bloco.
-3. MODIFICAÇÃO CIRÚRGICA: Altere apenas o que foi pedido.
-4. RE-INSERÇÃO: Garanta que todas as funções mapeadas na Extração continuam existindo no arquivo após a edição.
+1. CONSULTA AO GRAFO (Neo4j / AST): Em vez de ler dezenas de arquivos, consulte apenas o nó e suas arestas imediatas (quem chama e quem é chamado).
+2. TETO DE TOKENS: O resultado de dependências não deve ultrapassar 1.500 tokens por turno.
+3. AUDITORIA PROFUNDA: Use `grep` focalizado em vez de dumps de pastas.
+4. EXTRAÇÃO: Mapeie as funções estritas do bloco a alterar.
+5. MODIFICAÇÃO CIRÚRGICA: Altere apenas o que foi pedido via replace_file_content.
+6. RE-INSERÇÃO: Garanta que todas as funções mapeadas continuam existindo no arquivo após a edição.
 ```
+
+## 4. Proibição de Memória Infinita na Sessão:
+- O banco vetorial (ChromaDB) e o Grafo (Neo4j) guardam a memória infinita do Kothar.
+- A **janela de contexto da sessão ativa** deve ser mantida cirúrgica (< 8.000 tokens por turno), sob risco de rate-limits de 5 horas e perda de raciocínio.
+- Para qualquer tarefa com mais de 2 arquivos, particione em sub-etapas e aplique o handoff.

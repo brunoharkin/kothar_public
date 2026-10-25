@@ -17,6 +17,27 @@ logger = logging.getLogger("kothar.project")
 
 # Coleção de projetos (cada um tem sua collection)
 PROJECT_COLLECTIONS = {}
+PROJECT_ROOTS = [
+    Path(value).expanduser().resolve()
+    for value in os.environ.get("KOTHAR_PROJECT_ROOTS", str(Path(__file__).resolve().parents[2])).split(":")
+    if value
+]
+SENSITIVE_PARTS = {".git", ".ssh", ".aws", "node_modules", "secrets", "credentials", ".venv", "venv"}
+SENSITIVE_NAMES = {".env", ".env.local", ".env.production", "credentials.json", "token.json"}
+
+
+def is_indexable_path(path: Path) -> bool:
+    try:
+        resolved = path.resolve(strict=True)
+        if not any(resolved == root or resolved.is_relative_to(root) for root in PROJECT_ROOTS):
+            return False
+        if {part.lower() for part in resolved.parts} & SENSITIVE_PARTS:
+            return False
+        if resolved.name.lower() in SENSITIVE_NAMES or resolved.suffix.lower() in {".pem", ".key", ".p12", ".pfx"}:
+            return False
+        return resolved.is_file()
+    except (OSError, RuntimeError):
+        return False
 
 
 def get_project_id(path: str) -> str:
@@ -98,7 +119,10 @@ async def index_project(
     Indexa um projeto (pasta) no ChromaDB.
     Retorna stats.
     """
-    project_path = os.path.abspath(project_path)
+    project = Path(project_path).expanduser().resolve()
+    if not any(project == root or project.is_relative_to(root) for root in PROJECT_ROOTS):
+        return {"ok": False, "error": "Diretório fora das raízes permitidas"}
+    project_path = str(project)
     if not os.path.isdir(project_path):
         return {"ok": False, "error": f"Não é diretório: {project_path}"}
 
@@ -134,9 +158,7 @@ async def index_project(
         # Filtra node_modules, .git, __pycache__, etc
         all_files = [
             f for f in all_files
-            if not any(skip in f.parts for skip in
-                       ["node_modules", ".git", "__pycache__", "dist", "build", ".venv", "venv"])
-            and f.is_file()
+            if is_indexable_path(f)
             and f.stat().st_size < 500_000  # 500KB max
         ]
         all_files = all_files[:max_files]

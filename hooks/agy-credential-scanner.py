@@ -5,9 +5,11 @@ Roda ANTES de write_to_file e replace_file_content.
 Bloqueia escrita de arquivos com credenciais expostas.
 Saída: JSON com decision allow/deny
 """
+import re
 import json
 import sys
-import re
+
+from hook_contract import normalize
 
 PADROES_CRITICOS = [
     (r'sk-[a-zA-Z0-9_-]{20,}', 'Anthropic/OpenAI API Key'),
@@ -21,34 +23,20 @@ PADROES_CRITICOS = [
 ]
 
 def main():
-    payload = {}
     raw = sys.stdin.read().strip()
-    if raw:
-        try:
-            payload = json.loads(raw)
-        except:
-            pass
-
-    tool_call = payload.get("toolCall", {})
-    tool_name = tool_call.get("name", "")
-    args = tool_call.get("args", {})
-
-    # Só verifica ferramentas de escrita
-    escrita_tools = {"write_to_file", "replace_file_content", "create_file"}
-    if tool_name not in escrita_tools:
-        print(json.dumps({"decision": "allow"}))
+    try:
+        event = normalize(json.loads(raw))
+    except (ValueError, json.JSONDecodeError):
+        deny("Evento de hook inválido; a escrita não pode ser verificada")
         return
 
-    # Extrai conteúdo dos contratos usados pelos diferentes runtimes.
-    conteudo = (
-        args.get("CodeContent", "")
-        or args.get("ReplacementContent", "")
-        or args.get("content", "")
-        or args.get("newContent", "")
-        or args.get("text", "")
-    )
-    if not isinstance(conteudo, str):
-        conteudo = json.dumps(conteudo, ensure_ascii=False)
+    if not event.is_write:
+        print(json.dumps({"decision": "allow"}))
+        return
+    conteudo = event.content()
+    if conteudo is None:
+        deny("Conteúdo de escrita ausente; a operação não pode ser inspecionada")
+        return
 
     violacoes = []
     for padrao, descricao in PADROES_CRITICOS:
@@ -56,18 +44,21 @@ def main():
             violacoes.append(descricao)
 
     if violacoes:
-        motivo = (
-            "🔴 KOTHAR GATE G3 — CREDENCIAL DETECTADA:\n"
-            + "\n".join(f"  • {v}" for v in violacoes)
-            + "\n\nREGRA INEGOCIÁVEL: Credenciais SEMPRE em variáveis de ambiente (.env). "
-            + "Nunca no código. Remova e use os.getenv() ou process.env."
-        )
-        print(json.dumps({
-            "decision": "deny",
-            "reason": motivo
-        }))
+        deny("Conteúdo bloqueado: " + ", ".join(sorted(set(violacoes))))
     else:
         print(json.dumps({"decision": "allow"}))
+
+
+def deny(reason: str) -> None:
+    print(json.dumps({
+        "decision": "deny",
+        "reason": reason,
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": reason,
+        },
+    }, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()

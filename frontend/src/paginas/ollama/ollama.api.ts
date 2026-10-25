@@ -1,3 +1,4 @@
+import { apiFetch } from '../../seguranca/sessao';
 export interface OllamaMetrics {
   prompt_eval_count?: number;
   eval_count?: number;
@@ -87,20 +88,11 @@ export const POPULAR_MODELS: OllamaModel[] = [
 ];
 
 export class OllamaService {
-  private baseUrl: string;
   private connected: boolean = false;
   private lastError: string | null = null;
   private useProxy: boolean = true;
 
-  constructor(baseUrl: string = 'http://kothar_ollama:11434') {
-    this.baseUrl = baseUrl;
-    this.useProxy = true; // SEMPRE via proxy para enriquecimento RAG
-  }
-
-  setBaseUrl(url: string) {
-    this.baseUrl = url;
-    this.connected = false;
-    this.lastError = null;
+  constructor() {
     this.useProxy = true; // SEMPRE via proxy para enriquecimento RAG
   }
 
@@ -131,13 +123,11 @@ export class OllamaService {
     const kotharRequest = { ...request, messages: cleanMessages };
 
     try {
-      // 1. Envia para o Background Worker (fila)
-      const response = await fetch(`/api/ollama/proxy/chat_async`, {
+      const response = await apiFetch(`/api/ollama/proxy/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...kotharRequest,
-          _ollama_url: this.baseUrl,
           session_id: request.session_id,
           // Options do Ollama (vão direto para o body)
           ...(request.options || {}),
@@ -146,11 +136,31 @@ export class OllamaService {
 
       if (!response.ok) throw new Error(`Proxy error: ${response.statusText}`);
 
-      const data = await response.json();
-      const sessionId = data.session_id || request.session_id;
-
-      // 2. Conecta ao Stream (SSE)
-      return this.connectStream(sessionId as string, onChunk);
+      if (!response.body) throw new Error('Resposta sem stream');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullResponse = '';
+      let finalMetrics: OllamaMetrics = {};
+      while (true) {
+        const { done, value } = await reader.read();
+        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const parsed = JSON.parse(line);
+          const content = parsed.message?.content || parsed.response || '';
+          if (content) {
+            fullResponse += content;
+            onChunk(fullResponse);
+          }
+          if (parsed.error) throw new Error('Falha no serviço de modelo');
+          if (parsed.done) finalMetrics = parsed;
+        }
+        if (done) break;
+      }
+      return { content: fullResponse, metrics: finalMetrics };
     } catch (error) {
       console.error('Proxy chat error:', error);
       throw error;
@@ -207,7 +217,7 @@ export class OllamaService {
         }
       };
 
-      eventSource.onerror = (err) => {
+      eventSource.onerror = () => {
         eventSource.close();
         // Pode falhar se a sessão não existe no worker, ou se a conexão cair
         reject(new Error("Erro de conexão SSE"));
@@ -218,7 +228,7 @@ export class OllamaService {
   async saveSessionToVault(title: string, messages: OllamaMessage[], type: 'session' | 'plan'): Promise<boolean> {
     try {
       const markdown = this.generateMarkdown(title, messages);
-      const res = await fetch('/api/vault/save', {
+      const res = await apiFetch('/api/vault/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, content: markdown, type })
@@ -247,7 +257,7 @@ export class OllamaService {
 
   async createTraceSession(name: string, model: string): Promise<string | null> {
     try {
-      const res = await fetch('/api/sessions/', {
+      const res = await apiFetch('/api/sessions/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -272,7 +282,7 @@ export class OllamaService {
   async logTraceMessage(sessionId: string, model: string, inputMsg: string, outputMsg: string, metrics: OllamaMetrics): Promise<void> {
     try {
       const durationMs = metrics.total_duration ? Math.round(metrics.total_duration / 1e6) : 0;
-      await fetch('/api/traces/', {
+      await apiFetch('/api/traces/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

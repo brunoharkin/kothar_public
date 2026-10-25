@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "policy_version", "default_environment", "fail_closed", "surfaces", "release_requirements", "prohibited_authorities"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "policy_id": {"const": "kothar-production-security"},
+    "policy_version": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}\\.[0-9]+$"},
+    "default_environment": {"const": "production"},
+    "fail_closed": {"const": true},
+    "surfaces": {
+      "type": "object",
+      "minProperties": 7,
+      "additionalProperties": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9-]+$"}}
+    },
+    "release_requirements": {"type": "array", "minItems": 6, "uniqueItems": true, "items": {"type": "string"}},
+    "prohibited_authorities": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"type": "string"}}
+  }
+}

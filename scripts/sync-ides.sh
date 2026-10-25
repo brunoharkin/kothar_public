@@ -95,6 +95,9 @@ validate_json "configuracao/kothar-ownership.json" || status=1
 validate_json "configuracao/kothar-transitions.json" || status=1
 validate_json "configuracao/kothar-integration.json" || status=1
 validate_json ".agents/agents/kothar.json" || status=1
+python3 "$ROOT/scripts/sincronizar-relatorio-entrega.py" --check || status=1
+python3 "$ROOT/scripts/verify-security-policy.py" || status=1
+python3 "$ROOT/scripts/sincronizar-politica-seguranca.py" --check || status=1
 
 if ((status != 0 || CHECK_ONLY == 1)); then
   if ((status != 0)); then

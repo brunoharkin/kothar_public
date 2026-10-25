@@ -1,0 +1,15 @@
+[Unit]
+Description=Kokoro Neural Engine - Servidor de Voz pt-BR (CPU)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/bruno-harkin/kothar/ferramentas/ambiente-voz/bin/python /home/bruno-harkin/kothar/ferramentas/leitor-voz-ptbr/kokoro_servidor.py
+Restart=always
+RestartSec=3
+WorkingDirectory=/home/bruno-harkin/kothar/ferramentas/leitor-voz-ptbr
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target
+

@@ -19,7 +19,7 @@ echo "🔒 KOTHAR PRE-COMMIT HOOK"
 echo "=============================================="
 
 # Diretório do projeto
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_DIR="$(git rev-parse --show-toplevel)"
 
 # 1. Executar auditor de segurança
 echo ""
@@ -28,28 +28,8 @@ echo ""
 
 cd "$PROJECT_DIR"
 
-python3 scripts/kothar_security_audit.py 2>/dev/null || {
-    echo ""
-    echo -e "${YELLOW}⚠️ Auditoria de segurança encontrou problemas${NC}"
-    echo ""
-    echo "Opções:"
-    echo "  1. Corrigir os problemas e tentar novamente"
-    echo "  2. Usar 'git commit --no-verify' para pular (NÃO RECOMENDADO)"
-    echo ""
-    read -p "Escolha uma opção (1/2): " choice
-    case $choice in
-        1) echo "Corrigindo problemas..."; exit 1 ;;
-        2) echo -e "${YELLOW}Pulando auditoria...${NC}"; exit 0 ;;
-        *) echo "Saindo..."; exit 1 ;;
-    esac
-}
-
-AUDIT_RESULT=$?
-
-if [ $AUDIT_RESULT -ne 0 ]; then
-    echo ""
-    echo -e "${RED}❌ COMMIT BLOQUEADO - Violações de segurança${NC}"
-    echo ""
+if ! python3 scripts/kothar_security_audit.py; then
+    echo "COMMIT BLOQUEADO: scanner reprovado ou indisponível."
     exit 1
 fi
 

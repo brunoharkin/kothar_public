@@ -190,7 +190,7 @@ async def read_file(path: str, max_lines: int = Query(default=200, le=2000)):
     try:
         p_resolved = p.resolve()
         cofre_resolved = COFRE_DIR.resolve()
-        if not str(p_resolved).startswith(str(cofre_resolved)):
+        if not p_resolved.is_relative_to(cofre_resolved):
             return {"error": f"Fora do cofre: {path}"}
     except Exception:
         return {"error": "Path inválido"}

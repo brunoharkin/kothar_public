@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "selection_notice": "Skills selecionadas orientam o trabalho; sua seleção não comprova leitura, execução, aprovação de segurança ou prontidão de produção.",
+  "common_skills": ["kothar-workflow", "definition-of-done", "kothar-dod"],
+  "routes": {
+    "frontend": ["frontend", "security", "qa"],
+    "backend": ["backend", "security", "qa"],
+    "fullstack": ["frontend", "backend", "security", "qa"],
+    "security": ["security", "qa"],
+    "general": ["engineer", "security", "qa"]
+  },
+  "steps": {
+    "frontend": {
+      "title": "Implementar interface conforme escopo",
+      "description": "Construir interface, estados e integração com o contrato disponível.",
+      "capability": "file_operations",
+      "skills": ["frontend-ugarit-ui", "motionsites", "amarracao-logica"],
+      "acceptance": ["Interface acessível e responsiva com estados de carregamento, erro e sucesso.", "Integração respeita o contrato de API e não guarda credenciais no navegador."]
+    },
+    "backend": {
+      "title": "Implementar contrato e serviços do backend",
+      "description": "Construir apenas os serviços exigidos pelos requisitos e seu contrato.",
+      "capability": "file_operations",
+      "skills": ["amarracao-logica", "kothar-seguranca"],
+      "acceptance": ["Entradas, autorização e erros são validados no servidor.", "Contrato de API e persistência necessários ao escopo possuem evidências funcionais."]
+    },
+    "engineer": {
+      "title": "Implementar alteração de escopo geral",
+      "description": "Executar a alteração delimitada sem acrescentar especialidades não solicitadas.",
+      "capability": "file_operations",
+      "skills": ["kothar-anti-amnesia"],
+      "acceptance": ["Alteração atende ao pedido e preserva dependências existentes."]
+    },
+    "security": {
+      "title": "Verificar credenciais e requisitos de segurança",
+      "description": "Verificar artefatos e reunir evidências de segurança sem executar DAST ou deploy.",
+      "capability": "credential_scan",
+      "skills": ["kothar-seguranca", "gate-seguranca-credenciais", "gate-producao"],
+      "acceptance": ["Artefatos não expõem credenciais; evidência do scanner corresponde aos arquivos verificados.", "Requisitos de segurança aplicáveis têm evidências ou bloqueiam a aprovação de produção."]
+    },
+    "qa": {
+      "title": "Verificar critérios funcionais da entrega",
+      "description": "Executar verificações apropriadas ao escopo e registrar resultados reais.",
+      "capability": "qa_checks",
+      "skills": [],
+      "acceptance": ["Verificações funcionais e de regressão passam com evidências vinculadas aos artefatos.", "Resultados ausentes ou falhos não são apresentados como execução aprovada."]
+    }
+  },
+  "blocked_actions": {
+    "dast": "DAST exige um fluxo específico com alvo, autorização e escopo validados; este mapa não disponibiliza scanners ofensivos.",
+    "deployment": "Deploy exige fluxo próprio e evidências de release; este mapa não disponibiliza ferramentas de implantação."
+  }
+}

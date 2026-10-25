@@ -1,16 +1,18 @@
+import { aceitarSessao, apiFetch } from '../../seguranca/sessao';
 import React, { useState } from 'react';
 import { Activity, Lock, User, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './LoginPage.styles.css';
 
 interface LoginPageProps {
-  onLogin: (token: string) => void;
+  onLogin: () => void;
+  initialError?: string;
 }
 
-export function LoginPage({ onLogin }: LoginPageProps) {
+export function LoginPage({ onLogin, initialError = '' }: LoginPageProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(initialError);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,7 +21,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -28,12 +30,14 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erro ao autenticar');
+        throw new Error(response.status === 429 ? 'Muitas tentativas. Aguarde antes de tentar novamente.' : 'Não foi possível autenticar.');
       }
 
-      onLogin(data.token);
+      aceitarSessao(data);
+      setPassword('');
+      onLogin();
     } catch (err: any) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Não foi possível autenticar.');
     } finally {
       setLoading(false);
     }
@@ -71,6 +75,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="login-input"
+              autoComplete="username"
+              required
+              maxLength={128}
               autoFocus
             />
           </div>
@@ -80,6 +87,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               <Lock className="h-5 w-5" />
             </div>
             <input
+              autoComplete="current-password"
+              required
+              maxLength={1024}
               type="password"
               placeholder="Senha"
               value={password}

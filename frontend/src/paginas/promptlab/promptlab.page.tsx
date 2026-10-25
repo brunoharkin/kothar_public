@@ -27,15 +27,15 @@ export function PromptLabPage() {
 
   useEffect(() => {
     setKnownPrompts(promptLabApi.listKnownPrompts());
-    setVariants(promptLabApi.getVariants());
+    promptLabApi.getVariants().then(setVariants).catch(() => setVariants([]));
   }, []);
 
   // Fallback defensivo — se knownPrompts vier vazio, lista fallback
   const safeKnownPrompts = Array.isArray(knownPrompts) ? knownPrompts : [];
 
-  const persistVariants = (next: PromptVariant[]) => {
+  const persistVariants = async (next: PromptVariant[]) => {
     setVariants(next);
-    next.forEach((v) => promptLabApi.saveVariant(v));
+    await Promise.all(next.map((v) => promptLabApi.saveVariant(v)));
   };
 
   const createNewVariant = (fromPrompt?: AgentPrompt) => {
@@ -50,16 +50,16 @@ export function PromptLabPage() {
     setEditingVariant(newVariant);
   };
 
-  const saveVariant = (v: PromptVariant) => {
+  const saveVariant = async (v: PromptVariant) => {
     const next = [...variants.filter((x) => x.id !== v.id), v];
-    persistVariants(next);
+    await persistVariants(next);
     setEditingVariant(null);
   };
 
-  const deleteVariant = (id: string) => {
+  const deleteVariant = async (id: string) => {
     const next = variants.filter((v) => v.id !== id);
-    persistVariants(next);
-    promptLabApi.deleteVariant(id);
+    await promptLabApi.deleteVariant(id);
+    setVariants(next);
   };
 
   const runVariant = async (variant: PromptVariant) => {
@@ -73,7 +73,7 @@ export function PromptLabPage() {
       ...variant,
       results: [result, ...variant.results].slice(0, 20), // mantém últimos 20
     };
-    saveVariant(updated);
+    await saveVariant(updated);
     setRunning(false);
   };
 
@@ -91,7 +91,7 @@ export function PromptLabPage() {
         results: [result, ...updated[i].results].slice(0, 20),
       };
     }
-    persistVariants(updated);
+    await persistVariants(updated);
     setRunning(false);
   };
 

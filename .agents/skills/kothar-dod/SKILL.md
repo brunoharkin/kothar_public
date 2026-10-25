@@ -20,6 +20,9 @@ description: >-
 [ ] U5 — Escopo preservado (nada fora do pedido foi tocado)
 [ ] U6 — Credenciais scaneadas (zero chaves/senhas no código)
 [ ] U7 — Console limpo (zero erros no terminal/browser)
+[ ] U8 — Nenhum console.log expõe dados de sessão, tokens, senhas ou dados pessoais
+[ ] U9 — Se deploy em produção: gate-producao verificado (skill gate-producao)
+[ ] U10 — Entrega final lista agentes, habilidades, ferramentas, verificações e limitações reais desta interação (auto-relatabilidade)
 ```
 
 ---
@@ -35,7 +38,7 @@ description: >-
 [ ] F5 — Performance: sem rerenders desnecessários
 [ ] F6 — Integração com API funcionando (não mock hardcoded)
 [ ] F7 — Screenshot ou descrição visual incluída no relatório
-+ DoD Universal (U1-U7)
++ DoD Universal (U1-U10)
 ```
 
 ### Feature de Backend / API
@@ -47,7 +50,10 @@ description: >-
 [ ] B5 — Dados sensíveis não expostos na resposta
 [ ] B6 — Teste de integração roda e passa
 [ ] B7 — Documentação da rota atualizada (se aplicável)
-+ DoD Universal (U1-U7)
+[ ] B8 — Rate limiting aplicado em rotas públicas e de autenticação (BLOQUEANTE)
+[ ] B9 — Sessão/auth armazenada server-side (Redis/Postgres), NUNCA localStorage
+[ ] B10 — Headers de segurança configurados (HSTS, X-Content-Type-Options, X-Frame-Options)
++ DoD Universal (U1-U10)
 ```
 
 ### Bug Fix
@@ -57,7 +63,7 @@ description: >-
 [ ] D3 — Sem regressão visual (se bug era funcional)
 [ ] D4 — Causa raiz documentada ("o que era + por que acontecia")
 [ ] D5 — Correção é mínima (diff mostra apenas o necessário)
-+ DoD Universal (U1-U7)
++ DoD Universal (U1-U10)
 ```
 
 ### Commit / Git
@@ -67,7 +73,7 @@ description: >-
 [ ] G3 — Branch correta (não está em main por acidente)
 [ ] G4 — Bruno aprovou push (CP4) se for para main/staging
 [ ] G5 — CHANGELOG atualizado se for release
-+ DoD Universal (U1-U7)
++ DoD Universal (U1-U10)
 ```
 
 ### Novo Projeto / Scaffold
@@ -78,7 +84,22 @@ description: >-
 [ ] P4 — .gitignore inclui .env e arquivos de build
 [ ] P5 — visao.md e estado-atual.md criados
 [ ] P6 — Git inicializado com commit inicial
-+ DoD Universal (U1-U7)
++ DoD Universal (U1-U10)
+```
+
+### Deploy em Produção
+```
+[ ] PR1 — Rate limiting em rotas públicas e de autenticação (min: 5 tentativas/15min em login)
+[ ] PR2 — Sessão server-side (Redis/Postgres), zero localStorage para auth
+[ ] PR3 — Token em HttpOnly Cookie (Secure + SameSite=Strict)
+[ ] PR4 — Headers de segurança: HSTS, CSP, X-Content-Type-Options, X-Frame-Options
+[ ] PR5 — CORS restrito (sem wildcard * em produção)
+[ ] PR6 — Zero console.log com dados sensíveis no frontend
+[ ] PR7 — Portas de debug/admin não expostas publicamente
+[ ] PR8 — .env não commitado, variáveis de produção configuradas no servidor
+[ ] PR9 — HTTPS obrigatório com redirecionamento de HTTP
+[ ] PR10 — Logout invalida sessão no servidor
++ DoD Universal (U1-U10)
 ```
 
 ---

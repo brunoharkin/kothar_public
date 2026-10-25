@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Query
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import desc, select
 
 from backend.core.database import get_db_session
@@ -13,6 +14,22 @@ from backend.trace.models import Session
 
 log = get_logger("api.sessions")
 router = APIRouter()
+
+
+class SessionCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    agent_name: str = Field(default="unknown", min_length=1, max_length=100)
+    llm_model: str | None = Field(default=None, max_length=100)
+    task_summary: str | None = Field(default=None, max_length=2_000)
+    metadata: dict = Field(default_factory=dict)
+
+
+class SessionComplete(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    status: str = Field(default="completed", pattern=r"^(completed|failed|partial|blocked)$")
+    tokens_input: int | None = Field(default=None, ge=0, le=100_000_000)
+    tokens_output: int | None = Field(default=None, ge=0, le=100_000_000)
+    total_cost_usd: float | None = Field(default=None, ge=0, le=1_000_000)
 
 
 @router.get("/")
@@ -36,14 +53,14 @@ async def list_sessions(
 
 
 @router.post("/")
-async def create_session(body: dict):
+async def create_session(body: SessionCreate):
     """Inicia uma nova sessão de agente."""
     async with get_db_session() as db:
         session = Session(
-            agent_name=body.get("agent_name", "unknown"),
-            llm_model=body.get("llm_model"),
-            task_summary=body.get("task_summary"),
-            metadata_=body.get("metadata", {}),
+            agent_name=body.agent_name,
+            llm_model=body.llm_model,
+            task_summary=body.task_summary,
+            metadata_=body.metadata,
         )
         db.add(session)
         await db.flush()
@@ -64,7 +81,7 @@ async def get_session(session_id: uuid.UUID):
 
 
 @router.patch("/{session_id}/complete")
-async def complete_session(session_id: uuid.UUID, body: dict):
+async def complete_session(session_id: uuid.UUID, body: SessionComplete):
     """Finaliza uma sessão."""
     async with get_db_session() as db:
         result = await db.execute(select(Session).where(Session.id == session_id))
@@ -72,10 +89,10 @@ async def complete_session(session_id: uuid.UUID, body: dict):
         if not session:
             return JSONResponse(status_code=404, content={"error": "Sessão não encontrada"})
         session.ended_at = datetime.now(timezone.utc)
-        session.status = body.get("status", "completed")
-        session.tokens_input = body.get("tokens_input", session.tokens_input)
-        session.tokens_output = body.get("tokens_output", session.tokens_output)
-        session.total_cost_usd = body.get("total_cost_usd", session.total_cost_usd)
+        session.status = body.status
+        if body.tokens_input is not None: session.tokens_input = body.tokens_input
+        if body.tokens_output is not None: session.tokens_output = body.tokens_output
+        if body.total_cost_usd is not None: session.total_cost_usd = body.total_cost_usd
         log.info("Sessão finalizada", session_id=str(session_id), status=session.status)
         return _session_to_dict(session)
 

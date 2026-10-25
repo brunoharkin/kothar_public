@@ -10,6 +10,7 @@
 """
 
 from typing import Any
+
 from backend.core.logger import get_logger
 
 log = get_logger("harness.step_validator")
@@ -111,7 +112,18 @@ class StepValidator:
             )
 
         # 3. Verifica dependências
-        deps_result = self._check_dependencies(step_title)
+        explicit = step.get("depends_on")
+        if explicit is not None:
+            ids = [item.get("id") for item in self.blueprint.get("steps", [])]
+            completed_ids = {item.get("id") for item in self.blueprint.get("steps", [])
+                             if item.get("title", "") in self._completed_steps}
+            valid = (isinstance(explicit, list) and all(type(dep) is int for dep in explicit)
+                     and len(set(explicit)) == len(explicit) and step_id not in explicit
+                     and all(dep in ids for dep in explicit))
+            missing = [str(dep) for dep in explicit if dep not in completed_ids] if valid else ["dependências inválidas"]
+            deps_result = {"satisfied": valid and not missing, "missing": missing}
+        else:
+            deps_result = self._check_dependencies(step_title)
         if not deps_result["satisfied"]:
             return StepValidationResult(
                 can_execute=False,

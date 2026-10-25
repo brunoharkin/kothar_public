@@ -26,6 +26,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from backend.core.database import get_db_session
+from backend.core.privacy import REDACTED, safe_metadata
 from backend.core.logger import get_logger
 from backend.trace.models import Session, Trace
 from backend.trace.metrics import record_trace, record_session, record_agent
@@ -73,9 +74,9 @@ class TraceRecorder:
                 id=uuid.UUID(session_id),
                 agent_name=agent_name,
                 llm_model=llm_model,
-                task_summary=task_summary,
+                task_summary=REDACTED if task_summary else "",
                 status="active",
-                metadata_=metadata or {},
+                metadata_=safe_metadata(metadata),
             )
             db.add(session)
 
@@ -151,15 +152,15 @@ class TraceRecorder:
                 sequence=seq,
                 event_type=event_type,
                 agent_name=agent_name,
-                content=content[:10000] if content else None,  # limita conteúdo
+                content=REDACTED if content else None,  # no free text in operational traces
                 tool_name=tool_name,
-                tool_input=tool_input,
-                tool_output=tool_output,
+                tool_input=safe_metadata(tool_input),
+                tool_output=safe_metadata(tool_output),
                 duration_ms=duration_ms,
                 tokens_used=tokens_used,
                 is_error=is_error,
-                error_message=error_message,
-                metadata_=metadata or {},
+                error_message=REDACTED if error_message else None,
+                metadata_=safe_metadata(metadata),
             )
             db.add(trace)
 
@@ -286,7 +287,7 @@ class TraceRecorder:
         trace_id = str(uuid.uuid4())
         seq = self._next_sequence(session_id)
 
-        extra_meta = metadata or {}
+        extra_meta = safe_metadata(metadata)
         extra_meta["thinking_length_chars"] = len(thinking_content)
         extra_meta["thinking_length_tokens_est"] = max(1, int(len(thinking_content) / 3.5))
 
@@ -297,9 +298,9 @@ class TraceRecorder:
                 sequence=seq,
                 event_type="thinking",
                 agent_name=agent_name,
-                content=thinking_content,  # SEM TRUNCAMENTO - thinking pode ser longo
+                content=REDACTED,
                 tool_name="Claude:thinking",
-                tool_input={"thinking": thinking_content},
+                tool_input={},
                 tokens_used=tokens,
                 metadata_=extra_meta,
             )
