@@ -249,6 +249,17 @@ ${BLUE}════════════════════════�
 EOF
 }
 
+
+cmd_trace() {
+    echo -e "${CYAN}📊 KOTHAR TRACE RECORDER & SESSIONS${NC}"
+    echo "================================================="
+    if [ -f "$KOTHAR_DIR/hooks/kothar-trace-view.sh" ]; then
+        bash "$KOTHAR_DIR/hooks/kothar-trace-view.sh" "${1:-stats}" "${2:-20}"
+    else
+        echo "Trace viewer não encontrado em hooks/kothar-trace-view.sh"
+    fi
+}
+
 # ============================================
 # MAIN
 # ============================================
@@ -258,5 +269,8 @@ case "${1:-activate}" in
     health|h) cmd_health ;;
     fix|f) cmd_fix ;;
     help|--help|-h) cmd_help ;;
+    trace|t) shift; cmd_trace "$@" ;;
     *) cmd_help ;;
 esac
+
+

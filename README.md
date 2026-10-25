@@ -94,6 +94,17 @@ Em qualquer IDE configurada, basta digitar o comando de inicialização no chat 
 /kothar
 ```
 
+### 📋 Comandos Disponíveis no Chat e Terminal
+
+| Comando | Descrição | Onde Visualizar |
+| :--- | :--- | :--- |
+| `/kothar` | Inicializa o orquestrador com os 5 sensores de percepção | Chat da IDE |
+| `/kothar trace` | Inspeciona e registra a telemetria, eventos e thinking da sessão ativa | Chat / Painel Web (`:3030/trace`) |
+| `/kothar status` | Mostra status dos serviços, portas e watchdog ativo | Terminal / Chat |
+| `/kothar health` | Executa o Health Check completo de 31 verificações de integridade | Terminal / Chat |
+| `/kothar fix` | Aplica autocura automática em pastas, configs ou permissões | Terminal |
+
+
 O Kothar executará os 5 sensores de percepção, validará o RAG, identificará o operador ativo e responderá pronto para orquestrar:
 
 ```text

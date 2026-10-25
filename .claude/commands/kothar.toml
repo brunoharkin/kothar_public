@@ -42,3 +42,9 @@ name = "kothar-ports"
 description = "Verificar portas em uso"
 command = "bash"
 args = ["-c", "lsof -i :2785 -i :2786 -i :3000 -i :5432 -i :5433 -i :5440 2>/dev/null || echo 'Nenhuma porta em uso'"]
+
+[[commands]]
+name = "kothar-trace"
+description = "Visualizar e registrar traces da sessão ativa no frontend/painel Kothar"
+command = "bash"
+args = ["-c", "/home/bruno-harkin/kothar/hooks/kothar-trace-view.sh stats && /home/bruno-harkin/kothar/hooks/kothar-trace-view.sh events 10"]

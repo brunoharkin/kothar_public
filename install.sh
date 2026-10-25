@@ -105,8 +105,13 @@ fi
 
 # 6. Sincronização com IDEs (VS Code, Copilot, Claude, Gemini, Codex)
 echo "🔄 [6/6] Sincronizando integrações nativas com IDEs..."
-chmod +x "$ROOT/scripts/sync-ides.sh"
+chmod +x "$ROOT/scripts/sync-ides.sh" "$ROOT/scripts/kothar-cli.sh" "$ROOT/hooks/kothar-trace-view.sh" 2>/dev/null || true
 "$ROOT/scripts/sync-ides.sh" --workspace
+
+# Criar alias conveniente para kothar no terminal se suportado
+if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
+    ln -sf "$ROOT/scripts/kothar-cli.sh" "$HOME/.local/bin/kothar" 2>/dev/null || true
+fi
 
 echo ""
 echo "🎉 [SUCESSO] KOTHAR v4.0 INSTALADO E PRONTO PARA ORQUESTRAR!"
