@@ -1,0 +1,29 @@
+{
+  "name": "kothar-trace-backend",
+  "version": "1.0.0",
+  "description": "Backend da API de Trace do Kothar v3.0",
+  "main": "servidor-principal.ts",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only servidor-principal.ts",
+    "start": "node -r ts-node/register/transpile-only servidor-principal.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.23.0",
+    "redis": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.9.0",
+    "@types/pg": "^8.23.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3"
+  }
+}

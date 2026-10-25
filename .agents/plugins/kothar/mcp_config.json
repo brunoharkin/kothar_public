@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "21st": {
+      "serverUrl": "https://21st.dev/api/mcp"
+    },
+    "kothar": {
+      "command": "bash",
+      "args": ["-c", "echo Kothar MCP Server - Maestro v3.0"]
+    },
+    "obsidian-mcp-complete": {
+      "command": "node",
+      "args": ["/home/bruno-harkin/obsidian-mcp/dist/stdio.js"],
+      "env": {
+        "OBSIDIAN_VAULT_PATH": "/home/bruno-harkin/Cofre",
+        "OBSIDIAN_MEMORY_FOLDER": "00_Memoria"
+      }
+    },
+    "youtube-scrap": {
+      "command": "node",
+      "args": ["/home/bruno-harkin/.gemini/config/youtube-wrapper.js"]
+    }
+  }
+}
+

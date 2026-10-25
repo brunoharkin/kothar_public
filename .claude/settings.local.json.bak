@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(kothar-trace)",
+      "Bash(mkdir -p /home/bruno/.claude/skills)",
+      "Bash(cat)",
+      "Skill(kothar)",
+      "mcp__ide__getDiagnostics",
+      "mcp__codebase-memory-mcp__get_architecture",
+      "mcp__codebase-memory-mcp__search_graph",
+      "Bash(ollama list *)"
+    ]
+  }
+}

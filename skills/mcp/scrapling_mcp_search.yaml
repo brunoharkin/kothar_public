@@ -1,0 +1,81 @@
+# ===========================================================
+# KOTHAR SKILL — Especialista em Buscas Web (Scrapling MCP)
+# Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# Skill que ensina o Maestro e os Agentes a utilizar o
+# Servidor MCP nativo do Scrapling para navegação avançada.
+# ===========================================================
+
+metadata:
+  name: "scrapling_mcp_search_specialist"
+  version: "1.0.0"
+  category: "scraping"
+  tags:
+    - mcp
+    - web-search
+    - scraping
+    - stealth
+  description: "Como utilizar o MCP Server do Scrapling para buscas hiper-eficientes e stealth."
+  forged_by: "maestro"
+  forged_at: "2026-08-30"
+  success_rate: 100.0
+  usage_count: 0
+
+context:
+  when_to_use: |
+    Use esta skill SEMPRE que precisar extrair informações estruturadas da internet,
+    ler repositórios externos, contornar bloqueios anti-bot ou buscar documentações.
+    A ferramenta acessa o serviço MCP local hospedado na rede Docker (kothar_scrapling_mcp:8000).
+
+  preconditions:
+    - "Serviço kothar_scrapling_mcp online via Streamable HTTP"
+    - "O MCP está configurado com as 13 ferramentas (make_request, stealthy_fetch, etc)"
+
+  constraints:
+    - "Não faça chamadas a `make_request` ou `stealthy_fetch` sem um `CSS Selector` caso queira um dado específico (economiza tokens)."
+    - "De preferência para saída Markdown (a menos que precise de HTML)."
+
+blueprint:
+  steps:
+    - id: 1
+      action: "Decidir a ferramenta de busca apropriada"
+      template: |
+        Se for site simples ou API: use a tool `make_request`
+        Se tiver bloqueio (Cloudflare Turnstile, captchas) ou renderização densa JS: use `stealthy_fetch`
+        Se for bulk de URLs paralelas: use `bulk_fetch` ou `bulk_stealthy_fetch`
+
+    - id: 2
+      action: "Otimizar o input do Prompt"
+      template: |
+        Sempre que possível, no seu JSON ou Prompt MCP para a ferramenta:
+        {
+           "url": "https://alvo.com",
+           "css_selector": "article.main-content", // Focar só onde importa
+           "main_content_only": true              // Tira sujeira, menus, ads
+        }
+
+    - id: 3
+      action: "Uso de Sessões (Opcional)"
+      template: |
+        Se você precisa de navegação entre várias páginas de um mesmo domínio ou
+        logar no site, use as tools de Sessão:
+        1) `open_session(type="stealthy")`
+        2) Vários `session_fetch(session_id="xyz", url="...")`
+        3) `close_session(session_id="xyz")` - OBRIGATÓRIO
+
+examples:
+  - description: "Contornando proteção da Cloudflare e extraindo em formato Markdown"
+    code: |
+      O Agente invoca a tool MCP `stealthy_fetch`:
+      Argumentos enviados pelo LLM:
+      {
+        "url": "https://site-protegido.com/produtos",
+        "solve_cloudflare": true,
+        "headless": true,
+        "css_selector": ".product-list"
+      }
+      Retorno será Markdown nativo limpo pelo Scrapling.
+
+locks:
+  - "NUNCA passe a URL base de um site sem tentar usar CSS selectors para limpar a árvore DOM."
+  - "SEMPRE lembre de usar `close_session` se abriu uma sessão persistente para múltiplos fetches."

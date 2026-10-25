@@ -1,0 +1,16 @@
+{
+  "kothar-structure-audit": {
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/kothar-structure-audit.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "name": "kothar-execution-transitions",
+  "maxReviewAttempts": 3,
+  "transitions": [
+    {
+      "from": "triage",
+      "on": "classified",
+      "conditions": ["project_confirmed", "scope_known"],
+      "next": ["blueprint"],
+      "owner": "triage"
+    },
+    {
+      "from": "triage",
+      "on": "ambiguous",
+      "conditions": ["single_question_pending"],
+      "next": ["checkpoint"],
+      "owner": "core"
+    },
+    {
+      "from": "blueprint",
+      "on": "approved",
+      "conditions": ["agent", "files", "dependencies", "acceptance"],
+      "next": ["execution"],
+      "owner": "architect"
+    },
+    {
+      "from": "execution",
+      "on": "completed",
+      "conditions": ["handoff_valid", "evidence_present"],
+      "next": ["review"],
+      "owner": "code-reviewer"
+    },
+    {
+      "from": "review",
+      "on": "approved",
+      "conditions": ["independent_reviewer", "dod_present"],
+      "next": ["security"],
+      "owner": "security"
+    },
+    {
+      "from": "review",
+      "on": "changes_requested",
+      "conditions": ["retry_count_lt_3", "actionable_findings"],
+      "next": ["execution"],
+      "owner": "engineer"
+    },
+    {
+      "from": "security",
+      "on": "passed",
+      "conditions": ["credential_scan", "input_validation"],
+      "next": ["qa"],
+      "owner": "qa"
+    },
+    {
+      "from": "qa",
+      "on": "passed",
+      "conditions": ["tests_evidence", "scope_preserved"],
+      "next": ["evaluator"],
+      "owner": "agent-evaluator"
+    },
+    {
+      "from": "evaluator",
+      "on": "accepted",
+      "conditions": ["risks", "metric", "tradeoffs", "scope_out", "dod"],
+      "next": ["done"],
+      "owner": "core"
+    },
+    {
+      "from": "review",
+      "on": "blocked",
+      "conditions": ["blocker_evidence"],
+      "next": ["checkpoint"],
+      "owner": "core"
+    }
+  ]
+}

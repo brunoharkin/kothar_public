@@ -1,0 +1,16 @@
+{
+  "kothar-post-codegen-validate": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ROOT=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}\"; bash \"$ROOT/hooks/post-codegen-validate.sh\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

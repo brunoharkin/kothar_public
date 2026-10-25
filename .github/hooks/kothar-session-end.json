@@ -1,0 +1,11 @@
+{
+  "kothar-session-end": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "ROOT=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}\"; bash \"$ROOT/hooks/post-session-learner.sh\"",
+        "timeout": 30
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "versao": "4.0.0",
+  "operador": {
+    "nome": "{{NOME_DO_USUARIO}}",
+    "empresa": "{{NOME_DA_EMPRESA}}",
+    "cargo": "Desenvolvedor / Operador"
+  },
+  "caminhos": {
+    "kothar_dir": "{{KOTHAR_DIR}}",
+    "vault_dir": "{{VAULT_DIR}}",
+    "chroma_dir": "{{CHROMA_DIR}}"
+  },
+  "rag": {
+    "ativo": true,
+    "modo": "persistente_local"
+  }
+}

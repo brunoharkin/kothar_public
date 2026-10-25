@@ -1,0 +1,55 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Agent",
+      "TaskOutput",
+      "TaskStop",
+      "Artifact",
+      "NotebookEdit",
+      "EnterPlanMode",
+      "ExitPlanMode",
+      "Read(/home/bruno/**)",
+      "Write(/home/bruno/**)",
+      "Edit(/home/bruno/**)",
+      "Bash(echo \"=== LIMPEZA DE SESSOES ANTIGAS ===\" && rm -f ~/.claude/projects/-home-bruno-kothar/*.jsonl && echo \"Sessoes antigas removidas\" && echo \"\" && ls -lh ~/.claude/projects/-home-bruno-kothar/*.jsonl 2>/dev/null)",
+      "Bash(chmod +x /home/bruno/kothar/hooks/*.sh)",
+      "Bash(mkdir -p /home/bruno/.claude/hooks)",
+      "Bash(touch /home/bruno/.claude/hooks/hook.log /home/bruno/.claude/hooks/errors.log)"
+    ],
+    "additionalDirectories": [
+      "/home/bruno/.claude",
+      "/home/bruno/kothar",
+      "/home/bruno/.claude/projects/-home-bruno-kothar",
+      "/home/bruno/.claude/plans"
+    ]
+  },
+  "disabledMcpServers": [],
+  "enabledMcpjsonServers": [
+    "playwright"
+  ],
+  "hooks": [
+    {
+      "name": "kothar-session-init",
+      "command": "/home/bruno/kothar/hooks/kothar-session-init.sh",
+      "when": "sessionStart"
+    },
+    {
+      "name": "kothar-credential-scanner",
+      "command": "/home/bruno/kothar/hooks/credential-scanner.sh",
+      "when": "PostToolUse[Edit,Write]"
+    },
+    {
+      "name": "kothar-post-tool-observer",
+      "command": "/home/bruno/kothar/hooks/kothar-post-tool-observer.sh",
+      "when": "PostToolUse[*]"
+    }
+  ]
+}

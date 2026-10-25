@@ -1,0 +1,22 @@
+# ===========================================================
+# KOTHAR GLOBAL MANDATE — O Padrão Ouro (Gold Standard)
+# Arquiteto & Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# A Lei Universal. Todos os 19 Agentes DEVEM obedecer a estas 
+# regras antes de escrever uma única linha de código.
+# ===========================================================
+
+name: global_gold_standard
+description: |
+  Diretriz de Segurança Militar e Qualidade Enterprise.
+  Seja para criar um micro-SaaS ou um Agente SDR, as aplicações devem ser impenetráveis.
+
+mandates:
+  - NATIVE_MCP_FIRST: A prioridade máxima para trânsito de dados e comunicação entre sistemas/agentes é a construção e utilização de Servidores MCP (Model Context Protocol) nativos e confiáveis, evitando gambiarras de API inseguras.
+  - ANTI_PROMPT_INJECTION: Blindagem obrigatória contra ataques invisíveis. O código gerado DEVE ter sanitização rigorosa para impedir que usuários injetem "textos brancos camuflados" (White-text) em PDFs ou prompts para destravar senhas ou vazar informações.
+  - ZERO_DATA_LEAKAGE: Multi-Tenancy Isolado. O DBA e o Backend NUNCA podem permitir que os dados do Usuário A cruzem com o Usuário B. O Frontend nunca deve receber chaves ou dados mascarados. Zero Estado no Frontend.
+  - CONCURRENCY_LOCK: Bloqueio contra compartilhamento de contas. Toda aplicação terá limite de sessão (1 Mobile, 1 Web). Se uma nova sessão for aberta, a antiga deve ser deslogada. A validação do ID da sessão é obrigatória.
+  - ANTI_PIRACY_TRAP: Defesa Ativa. O código deve ser ofuscado e conter gatilhos que validem o ambiente. Se a aplicação for roubada e rodada em servidor pirata (sem as chaves originais do dono), ela exibirá nativamente uma página preta irônica: "Tente novamente mais tarde", ocultando o software real.
+
+applicability:
+  - GLOBAL: Esta lei se sobrepõe a todos os mandatos individuais dos agentes. Se o código ferir o Gold Standard, o Auditor de Segurança abortará a operação.

@@ -1,0 +1,1162 @@
+/* ===========================================================
+   KOTHAR v6.0 — Data Lake Styles (PROFISSIONAL)
+   Layout grid responsivo, dark theme consistente
+   =========================================================== */
+
+/* === BASE === */
+.datalake-page {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  color: #e4e4e7;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
+/* === HEADER === */
+.datalake-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.datalake-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.datalake-title h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fafafa;
+}
+
+.datalake-badge {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+.datalake-live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #a1a1aa;
+}
+
+.datalake-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.datalake-search-input {
+  background: #18181b;
+  border: 1px solid #27272a;
+  color: #fafafa;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  width: 280px;
+  outline: none;
+}
+
+.datalake-search-input:focus {
+  border-color: #22d3ee;
+}
+
+.datalake-btn-refresh {
+  background: #238636;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.datalake-btn-refresh:hover {
+  background: #2ea043;
+}
+
+/* === TABS === */
+.datalake-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #27272a;
+  overflow-x: auto;
+}
+
+.datalake-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #a1a1aa;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.datalake-tab:hover {
+  color: #fafafa;
+  border-bottom-color: #3f3f46;
+}
+
+.datalake-tab.active {
+  color: #22d3ee;
+  border-bottom-color: #22d3ee;
+}
+
+.datalake-tab-icon {
+  display: flex;
+  width: 16px;
+  height: 16px;
+}
+
+/* === GRID SYSTEM === */
+.datalake-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.datalake-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.datalake-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.datalake-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .datalake-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .datalake-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .datalake-grid-4, .datalake-grid-3, .datalake-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* === STAT CARDS === */
+.datalake-stat-card {
+  background: linear-gradient(135deg, #18181b 0%, #1f1f23 100%);
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.2s;
+}
+
+.datalake-stat-card:hover {
+  border-color: #3f3f46;
+  transform: translateY(-2px);
+}
+
+.datalake-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.datalake-stat-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.datalake-stat-label {
+  font-size: 10px;
+  color: #a1a1aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.datalake-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fafafa;
+  font-family: 'SF Mono', Monaco, monospace;
+  line-height: 1.2;
+}
+
+.datalake-stat-sub {
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+.datalake-stat-trend {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.datalake-stat-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #27272a;
+  font-size: 12px;
+  color: #a1a1aa;
+}
+
+/* === SECTIONS === */
+.datalake-section {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.datalake-section-title {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fafafa;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* === HEALTH CARDS === */
+.datalake-health-card {
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.datalake-health-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.datalake-health-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: #a1a1aa;
+  letter-spacing: 0.5px;
+}
+
+.datalake-health-status {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.datalake-health-latency {
+  font-size: 11px;
+  color: #71717a;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.datalake-health-error {
+  font-size: 10px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+/* === BAR CHARTS === */
+.datalake-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.datalake-bar-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 80px;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.datalake-bar-label {
+  color: #d4d4d8;
+  font-family: 'SF Mono', Monaco, monospace;
+  text-transform: capitalize;
+}
+
+.datalake-bar-track {
+  height: 8px;
+  background: #27272a;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.datalake-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22d3ee, #06b6d4);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.datalake-bar-count {
+  text-align: right;
+  font-weight: 700;
+  color: #fafafa;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+/* === LAYOUT (Sidebar + Main) === */
+.datalake-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  min-height: 500px;
+}
+
+@media (max-width: 900px) {
+  .datalake-layout { grid-template-columns: 1fr; }
+}
+
+.datalake-sidebar {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 16px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.datalake-sidebar h3 {
+  margin: 0 0 12px 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #71717a;
+}
+
+.datalake-project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.datalake-project-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #d4d4d8;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.datalake-project-item:hover {
+  background: #27272a;
+  color: #fafafa;
+}
+
+.datalake-project-item--active {
+  background: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.3);
+  color: #22d3ee;
+}
+
+.datalake-project-name {
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.datalake-project-path {
+  font-size: 10px;
+  color: #71717a;
+  font-family: 'SF Mono', Monaco, monospace;
+  margin-top: 2px;
+}
+
+/* === MAIN === */
+.datalake-main {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* === SEARCH BAR === */
+.datalake-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.datalake-search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fafafa;
+  font-size: 13px;
+}
+
+.datalake-search-bar button {
+  background: #22d3ee;
+  color: #0a0a12;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.datalake-search-bar button:hover:not(:disabled) {
+  background: #06b6d4;
+}
+
+.datalake-search-bar button:disabled {
+  background: #27272a;
+  color: #71717a;
+  cursor: not-allowed;
+}
+
+/* === LABEL CARDS === */
+.datalake-label-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.datalake-label-card {
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.datalake-label-name {
+  font-size: 12px;
+  color: #d4d4d8;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.datalake-label-count {
+  font-size: 13px;
+  color: #22d3ee;
+  font-weight: 700;
+}
+
+/* === RESULTS === */
+.datalake-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.datalake-result {
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.datalake-result:hover {
+  border-color: #22d3ee;
+  background: rgba(34, 211, 238, 0.05);
+}
+
+.datalake-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.datalake-result-type {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.datalake-result-name {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 13px;
+  color: #fafafa;
+  flex: 1;
+}
+
+.datalake-result-file {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 11px;
+  color: #71717a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.datalake-result-meta {
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 4px;
+  display: flex;
+  gap: 12px;
+}
+
+/* === TABLE === */
+.datalake-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #27272a;
+}
+
+.datalake-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.datalake-table thead {
+  background: #0f0f12;
+}
+
+.datalake-table th {
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #71717a;
+  font-weight: 700;
+  border-bottom: 1px solid #27272a;
+}
+
+.datalake-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #27272a;
+  color: #d4d4d8;
+}
+
+.datalake-table tr:last-child td {
+  border-bottom: none;
+}
+
+.datalake-table tr:hover {
+  background: rgba(34, 211, 238, 0.03);
+}
+
+.datalake-task-cell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.datalake-status {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.datalake-status--active {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.datalake-status--completed {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.datalake-status--failed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* === TRACES === */
+.datalake-traces-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+.datalake-trace {
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.datalake-trace--error {
+  border-left: 3px solid #ef4444;
+}
+
+.datalake-trace-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.datalake-trace-type {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #1f1f23;
+  color: #d4d4d8;
+}
+
+.datalake-trace-type--tool_call { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.datalake-trace-type--llm_response { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+.datalake-trace-type--decision { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+.datalake-trace-type--thinking { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+.datalake-trace-tool {
+  background: #1f1f23;
+  color: #d4d4d8;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.datalake-trace-error-badge {
+  background: #ef4444;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+.datalake-trace-time {
+  margin-left: auto;
+  font-size: 11px;
+  color: #71717a;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.datalake-trace-content {
+  font-size: 12px;
+  color: #d4d4d8;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.datalake-trace-input {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 10px;
+  color: #71717a;
+  overflow-x: auto;
+}
+
+.datalake-trace-error-msg {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.datalake-trace-footer {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #27272a;
+}
+
+/* === SKILLS === */
+.datalake-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.datalake-skill-card {
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.datalake-skill-card:hover {
+  border-color: #f59e0b;
+  transform: translateY(-2px);
+}
+
+.datalake-skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.datalake-skill-header h4 {
+  margin: 0;
+  font-size: 13px;
+  color: #fafafa;
+  flex: 1;
+  word-break: break-word;
+}
+
+.datalake-skill-category {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.datalake-skill-desc {
+  font-size: 12px;
+  color: #a1a1aa;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.datalake-skill-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #27272a;
+  flex-wrap: wrap;
+}
+
+.datalake-skill-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.datalake-tag {
+  background: #1f1f23;
+  color: #a1a1aa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+}
+
+/* === GRAPH (Bubble Map) === */
+.datalake-graph-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.datalake-graph-stat {
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.datalake-graph-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #22d3ee;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.datalake-graph-stat-label {
+  font-size: 10px;
+  color: #a1a1aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.datalake-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  padding: 20px;
+  background: #0f0f12;
+  border-radius: 8px;
+}
+
+.datalake-bubble {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: pointer;
+  padding: 12px;
+  min-width: 90px;
+  min-height: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.datalake-bubble:hover {
+  transform: scale(1.1);
+  border-color: #22d3ee;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.3) 0%, rgba(6, 182, 212, 0.1) 100%);
+}
+
+.datalake-bubble-label {
+  font-weight: 700;
+  color: #fafafa;
+  font-family: 'SF Mono', Monaco, monospace;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.datalake-bubble-count {
+  color: #22d3ee;
+  font-weight: 700;
+  font-family: 'SF Mono', Monaco, monospace;
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.datalake-edge-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.datalake-edge-card {
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.datalake-edge-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.datalake-edge-type {
+  font-size: 12px;
+  color: #fafafa;
+  font-weight: 600;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.datalake-edge-count {
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+/* === HOTSPOTS === */
+.datalake-hotspots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.datalake-hotspot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #0f0f12;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.datalake-hotspot-rank {
+  font-size: 18px;
+  font-weight: 700;
+  color: #22d3ee;
+  font-family: 'SF Mono', Monaco, monospace;
+  min-width: 40px;
+}
+
+.datalake-hotspot-name {
+  font-size: 13px;
+  color: #fafafa;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.datalake-hotspot-type {
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+.datalake-hotspot-degree {
+  margin-left: auto;
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* === EMPTY STATES === */
+.datalake-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #71717a;
+}
+
+.datalake-empty p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.datalake-empty-hint {
+  font-size: 12px;
+  color: #a1a1aa;
+}
+
+.datalake-empty-hint code {
+  background: #0f0f12;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 11px;
+  color: #22d3ee;
+}
+
+/* === ERRORS / WARNINGS === */
+.datalake-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.datalake-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+/* === MODAL === */
+.datalake-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.datalake-modal {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.datalake-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #27272a;
+}
+
+.datalake-modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #fafafa;
+}
+
+.datalake-modal-header button {
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.datalake-modal-header button:hover {
+  color: #fafafa;
+}
+
+.datalake-modal-file {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 4px;
+}
+
+.datalake-modal-content {
+  padding: 16px 20px;
+  overflow: auto;
+  background: #0f0f12;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 12px;
+  color: #d4d4d8;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* === LEGENDA DOS LABELS === */
+.datalake-legend {
+  margin-top: 20px;
+  padding: 16px;
+  background: #0f0f12;
+  border-radius: 8px;
+  border: 1px solid #27272a;
+}
+
+.datalake-legend-title {
+  margin: 0 0 12px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #71717a;
+  font-weight: 700;
+}
+
+.datalake-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.datalake-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.datalake-legend-code {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 80px;
+  text-align: center;
+}
+
+.datalake-legend-desc {
+  color: #d4d4d8;
+  font-size: 12px;
+}

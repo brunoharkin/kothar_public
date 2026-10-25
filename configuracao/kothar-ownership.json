@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "owner": "kothar",
+  "managedRoots": [
+    ".github/agents",
+    ".github/hooks",
+    ".agents/skills",
+    "configuracao/kothar-agent-registry.json",
+    "configuracao/kothar-integration.json"
+  ],
+  "preserveUserFiles": true,
+  "backupBeforeReplace": true,
+  "stableIdentity": "name + relativePath",
+  "neverManage": [
+    ".env",
+    ".env.*",
+    "docs/*/secrets*",
+    "**/*.key",
+    "**/*.pem"
+  ]
+}

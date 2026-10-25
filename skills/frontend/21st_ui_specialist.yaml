@@ -1,0 +1,33 @@
+# ===========================================================
+# KOTHAR SKILL — Especialista Frontend (21st UI Reference)
+# Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# Skill que ensina o Maestro Kothar a buscar referências
+# visuais ultra-premium usando o MCP 21st.
+# ===========================================================
+
+name: frontend_21st_specialist
+description: |
+  Especialista avançado em referências visuais de UI/UX. Deve ser invocado 
+  quando o usuário demandar um visual "Premium" para evitar o design "tosco"
+  ou genérico. Utiliza a biblioteca 21st.dev via MCP.
+
+mandates:
+  - NO_GENERIC_DASHBOARDS: Proibido criar painéis básicos (como fundos pretos com caixas arredondadas simples).
+  - FETCH_21ST_REFERENCES: Ao planejar a UI, o Agente DEVE consultar o MCP 21st para extrair componentes modernos, referências visuais (React/Tailwind) e animações.
+  - HIGH_END_AESTHETICS: Aplique Glassmorphism, Micro-interações, tipografia moderna e paletas de cores refinadas inspiradas nas melhores referências.
+
+capabilities:
+  - "Premium UI Component Retrieval"
+  - "Modern Dashboard Aesthetics"
+  - "Visual Reference Integration"
+
+usage_guidelines:
+  - LOCAL_RAG_SOURCE: ANTES de fazer qualquer chamada ao MCP, o Agente DEVE LER OBRIGATORIAMENTE o catálogo em `/home/bruno/kothar/scratch/threeui/21st_reference_catalog.md`.
+  - Utilize as QUERIES DE BUSCA exatas mapeadas no catálogo ao usar o MCP `21st` para pesquisar e importar componentes de ponta.
+  - O Agente está ESTRITAMENTE PROIBIDO de criar estruturas CSS/Tailwind de componentes visuais complexos "da própria cabeça". Ele deve importar a referência do 21st.
+  - Quando reformular ferramentas como o Kothar Observatory, aplique estas referências imediatamente para erradicar o "visual tosco".
+
+orchestration:
+  - Fase 1: Maestro invoca `frontend_21st_specialist` via MCP para carregar os componentes de referência.
+  - Fase 2: O Artista UI e o Engenheiro Front-End adaptam a estrutura HTML/React usando os modelos extraídos do 21st.dev.

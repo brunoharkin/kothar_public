@@ -1,0 +1,334 @@
+# KOTHAR SKILL: Fluxo de Trabalho Completo
+name: kothar-workflow
+description: Fluxo de trabalho obrigatório para todas as tarefas - 6 fases
+
+# ============================================================
+# SKILL: FLUXO DE TRABALHO KOTHAR v4.0
+# ============================================================
+# Este skill define o fluxo obrigatório para todas as tarefas
+# ============================================================
+
+## Visão Geral
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SEQUÊNCIA OBRIGATÓRIA                    │
+│                                                             │
+│   1. ENTENDER   →   2. PESQUISAR   →   3. PLANEJAR      │
+│        ↓                  ↓                  ↓            │
+│   4. IMPLEMENTAR →   5. TESTAR      →   6. SALVAR        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## FASE 1: ENTENDER
+
+### O que fazer
+- [ ] Ler a mensagem inteira do usuário
+- [ ] Identificar o objetivo final
+- [ ] Identificar restrições (segurança, prazo, etc.)
+- [ ] Perguntar se tiver dúvida
+
+### O que NÃO fazer
+- ❌ NÃO começar a programar sem entender
+- ❌ NÃO fazer suposições
+- ❌ NÃO pular esta fase
+
+### Perguntas de Validação
+```
+□ Qual é o objetivo final?
+□ Quais são as restrições?
+□ Existem dados sensíveis envolvidos?
+□ Qual projeto estou trabalhando?
+□ Qual é o escopo da alteração?
+```
+
+---
+
+## FASE 2: PESQUISAR
+
+### O que fazer
+- [ ] Consultar RAG: "Buscar código existente"
+- [ ] Consultar Memória: "Como foi feito?"
+- [ ] Buscar no projeto: grep por termos
+- [ ] Consultar Vault: Planos e documentação
+
+### Como usar RAG
+```
+# Usar a ferramenta de busca do codebase
+search_code: "termo relacionado a tarefa"
+
+# Verificar arquivos existentes
+grep -r "termo" --include="*.tsx" --include="*.py"
+```
+
+### O que fazer se encontrar código
+- ✅ SE SIM: Usar código existente
+- ✅ SE NÃO: Criar novo com cuidado
+
+### O que NÃO fazer
+- ❌ NÃO criar código novo se existir similar
+- ❌ NÃO ignorar código existente
+
+---
+
+## FASE 3: PLANEJAR
+
+### O que fazer
+- [ ] Criar plano detalhado
+- [ ] Salvar no cofre: `/home/bruno/cofre/planos/YYYY-MM-DD-tarefa.md`
+- [ ] Mostrar plano ao usuário
+- [ ] Aguardar aprovação
+
+### Template de Plano
+```markdown
+# Plano: [Título]
+
+## Objetivo
+[Descrição clara do que será feito]
+
+## Arquivos a Modificar
+- [ ] arquivo1.tsx
+- [ ] arquivo2.py
+
+## Mudanças Específicas
+1. [Detalhar mudança 1]
+2. [Detalhar mudança 2]
+
+## Riscos Identificados
+- [ ] Risco 1
+- [ ] Risco 2
+
+## Como Testar
+1. [Passo 1]
+2. [Passo 2]
+
+## Status
+[ ] Aguardando aprovação
+[ ] Aprovado - Em progresso
+[ ] Concluído
+```
+
+### O que NÃO fazer
+- ❌ NÃO implementar sem plano
+- ❌ NÃO pular aprovação do usuário
+
+---
+
+## FASE 4: IMPLEMENTAR
+
+### REGRA DE OURO
+```
+╔═══════════════════════════════════════════════════════════╗
+║  "UMA ALTERAÇÃO POR VEZ"                               ║
+║                                                           ║
+║  1. Fazer UMA mudança pequena                          ║
+║  2. Testar                                             ║
+║  3. Se OK → próxima mudança                            ║
+║  4. Se ERRO → corrigir ANTES de continuar             ║
+╚═══════════════════════════════════════════════════════════╝
+```
+
+### Checklist de Implementação
+- [ ] Implementar mudança 1
+- [ ] Testar mudança 1
+- [ ] Implementar mudança 2
+- [ ] Testar mudança 2
+- ...
+
+### O que NÃO fazer
+- ❌ NÃO fazer 10 mudanças de uma vez
+- ❌ NÃO fazer mudanças sem testar
+- ❌ NÃO ignorar erros
+
+---
+
+## FASE 5: TESTAR
+
+### Para cada alteração
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  TESTE DA ALTERAÇÃO                                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  COMPILAÇÃO:                                                │
+│  [ ] npm run dev (frontend)                               │
+│  [ ] python -m pytest (backend)                           │
+│                                                              │
+│  CONSOLE DO NAVEGADOR:                                    │
+│  [ ] Zero erros vermelhos                                 │
+│  [ ] Zero warnings de segurança                           │
+│                                                              │
+│  FUNCIONALIDADE:                                          │
+│  [ ] Funcionalidade específica funciona?                   │
+│  [ ] Funcionalidades relacionadas funcionam?               │
+│  [ ] Nada existente quebrou?                             │
+│                                                              │
+│  SEGURANÇA:                                               │
+│  [ ] Sem credenciais expostas                             │
+│  [ ] Sem dados sensíveis no localStorage                  │
+│  [ ] Logs sem informações sensíveis                       │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Ferramentas de Teste
+| Projeto | Comando |
+|---------|---------|
+| Frontend | `npm run dev` |
+| Frontend Build | `npm run build` |
+| TypeScript | `npx tsc --noEmit` |
+| Backend | `python -m pytest` |
+| Segurança | `python scripts/kothar_security_audit.py` |
+
+### O que NÃO fazer
+- ❌ NÃO prosseguir se algum teste falhar
+
+---
+
+## FASE 6: SALVAR
+
+### Commit
+```bash
+# Tipo(escopo): descrição
+feat(settings): adiciona bloco de credenciais
+fix(menu): corrige menu não aparecendo
+refactor(api): simplifica autenticação
+docs(readme): atualiza documentação
+```
+
+### Checklist Final
+- [ ] Todos os testes passaram
+- [ ] Console limpo
+- [ ] Segurança verificada
+- [ ] Plano salvo no cofre
+- [ ] Mensagem de commit clara
+
+### O que NÃO fazer
+- ❌ NÃO commitar código quebrado
+- ❌ NÃO commitar sem testar
+
+---
+
+## Regras por Tipo de Projeto
+
+### FRONTEND (Orby, etc.)
+```
+✅ PODE FAZER:
+   • Interfaces e layouts
+   • Validação visual de formulários
+   • Exibir dados da API
+   • Callbacks para ações do usuário
+
+❌ NÃO PODE FAZER:
+   • Esconder tokens em variáveis
+   • Salvar credenciais
+   • Guardar dados de acesso
+   • Conectar direto em bancos
+   • Expor portas internas
+```
+
+### BACKEND (Kothar API)
+```
+✅ PODE FAZER:
+   • Conectar em bancos de dados
+   • Gerenciar credenciais
+   • Validar permissões
+   • Criptografar dados
+   • Logar ações de usuário
+
+❌ NÃO PODE FAZER:
+   • Logar senhas ou tokens
+   • Expor dados sensíveis na resposta
+   • Guardar segredos em código
+```
+
+---
+
+## Checklist Rápido
+
+Antes de finalizar qualquer tarefa:
+
+```
+[ ] Entendi completamente a tarefa?
+[ ] Pesquisei código existente?
+[ ] Criei e salvei o plano?
+[ ] Implementei uma coisa por vez?
+[ ] Testei cada alteração?
+[ ] Verifiquei o console?
+[ ] Testei funcionalidades?
+[ ] Verifiquei segurança?
+[ ] Commitei com mensagem clara?
+[ ] Informei o usuário?
+```
+
+---
+
+## Quando Pular Etapas?
+
+```
+╔═══════════════════════════════════════════════════════════╗
+║  NUNCA                                                     ║
+║                                                            ║
+║  Todas as fases são OBRIGATÓRIAS para toda tarefa.       ║
+║  Não existe "é só um ajuste rápido".                     ║
+╚═══════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Resumo Visual
+
+```
+                    ┌─────────────────┐
+                    │   ENTENDER      │
+                    │   (Perguntar)   │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+              ▼              ▼              ▼
+        ┌─────────┐   ┌──────────┐   ┌────────┐
+        │ Encon-  │   │ Não Encon-│   │ Pergun-│
+        │ trou    │   │ trou     │   │ tou    │
+        └────┬────┘   └────┬─────┘   └────────┘
+             │              │              │
+             ▼              ▼              │
+      ┌─────────────────┐  │              │
+      │ USAR CÓDIGO     │  │              │
+      └─────────────────┘  │              │
+                   │       │              │
+                   ▼       ▼              │
+            ┌─────────────────┐           │
+            │    PLANEJAR     │◄──────────┘
+            │    (Salvar)    │
+            └────────┬────────┘
+                     │
+                     ▼
+            ┌─────────────────┐
+            │  IMPLEMENTAR    │
+            │ (UMA COISA/VEZ) │
+            └────────┬────────┘
+                     │
+              ┌──────┴──────┐
+              │             │
+              ▼             ▼
+        ┌──────────┐ ┌──────────┐
+        │  TESTOU  │ │  ERROU   │
+        │    OK    │ │ Corrigir │
+        └────┬─────┘ └────┬─────┘
+             │             │
+             ▼             ▼
+        ┌─────────────────────────┐
+        │     PRÓXIMA MUDANÇA     │
+        └─────────────────────────┘
+```
+
+---
+
+**Skill parte do sistema Kothar v4.0**
+**Versão: 2.0**
+**Data: 2026-09-10**

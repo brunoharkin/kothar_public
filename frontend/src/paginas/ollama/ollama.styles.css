@@ -1,0 +1,1354 @@
+.ollama-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--app-bg-base);
+  color: var(--app-text-primary);
+}
+
+.ollama-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: var(--app-bg-elevated);
+  border-bottom: 1px solid var(--app-border-subtle);
+}
+
+.ollama-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ollama-title h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.ollama-badge {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.ollama-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ollama-select {
+  background-color: var(--app-bg-base);
+  border: 1px solid var(--app-border-subtle);
+  color: var(--app-text-primary);
+  padding: 6px 12px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+}
+
+.ollama-btn-icon {
+  background: transparent;
+  border: 1px solid var(--app-border-subtle);
+  color: var(--app-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ollama-btn-icon:hover {
+  background: var(--app-bg-hover);
+  color: var(--app-text-primary);
+}
+
+.ollama-config-panel {
+  padding: 16px 24px;
+  background-color: var(--app-bg-elevated);
+  border-bottom: 1px solid var(--app-border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.ollama-input-config {
+  flex: 1;
+  background-color: var(--app-bg-base);
+  border: 1px solid var(--app-border-subtle);
+  color: var(--app-text-primary);
+  padding: 6px 12px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+}
+
+.ollama-btn-refresh {
+  background-color: #238636;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.ollama-btn-refresh:hover {
+  background-color: #2ea043;
+}
+
+.ollama-chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ollama-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--app-text-muted);
+}
+
+.ollama-empty-state h3 {
+  margin: 0 0 8px 0;
+  color: var(--app-text-primary);
+}
+
+.ollama-message-row {
+  display: flex;
+  gap: 12px;
+  max-width: 800px;
+  margin: 0 auto 16px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.ollama-message-row.user {
+  flex-direction: row-reverse;
+}
+
+/* Esconde o avatar do usuário para ficar igual ao ChatGPT */
+.ollama-message-row.user .ollama-avatar {
+  display: none;
+}
+
+.ollama-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ollama-message-row.assistant .ollama-avatar {
+  background-color: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.ollama-message-row.user .ollama-avatar {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
+.ollama-message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* A mensagem do usuário não deve ocupar 100% da largura, deve ter tamanho do texto */
+.ollama-message-row.user .ollama-message-content {
+  flex: 0 1 auto;
+  max-width: 75%;
+}
+
+.ollama-message-bubble {
+  background-color: var(--app-bg-elevated);
+  border: 1px solid var(--app-border-subtle);
+  padding: 12px 16px;
+  border-radius: 10px;
+  line-height: 1.5;
+  font-size: 14px;
+  color: var(--app-text-primary);
+}
+
+/* Mensagens do assistant: SEM fundo, próximo do avatar */
+.ollama-message-row.assistant .ollama-message-bubble {
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 0 !important;
+}
+
+/* Mensagens do usuário: sem fundo, alinhado à direita */
+.ollama-message-row.user .ollama-message-bubble {
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 0 !important;
+  color: #fff;
+}
+
+.ollama-input-area {
+  padding: 24px;
+  background-color: var(--app-bg-elevated);
+  border-top: 1px solid var(--app-border-subtle);
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.ollama-textarea {
+  flex: 1;
+  background-color: var(--app-bg-base);
+  border: 1px solid var(--app-border-subtle);
+  color: var(--app-text-primary);
+  padding: 12px 16px;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  resize: none;
+  min-height: 48px;
+  max-height: 200px;
+  font-family: inherit;
+}
+
+.ollama-send-btn {
+  background-color: #238636;
+  color: white;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.ollama-send-btn:hover:not(:disabled) {
+  background-color: #2ea043;
+}
+
+.ollama-send-btn:disabled {
+  background-color: var(--app-border-subtle);
+  color: var(--app-text-muted);
+  cursor: not-allowed;
+}
+
+/* Status Pill (Online/Offline) - discreto */
+.ollama-status-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.ollama-status-dot.connected {
+  background: rgba(46, 160, 67, 0.15);
+  color: #2ea043;
+}
+
+.ollama-status-dot.disconnected {
+  background: rgba(248, 81, 73, 0.15);
+  color: #f85149;
+}
+
+.ollama-error-hint {
+  font-size: 10px;
+  color: var(--app-text-muted, #999);
+  font-family: 'SF Mono', Monaco, monospace;
+  margin-left: 4px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Botões da coluna */
+.ollama-btn-save:hover {
+  background: rgba(96, 165, 250, 0.1);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+.ollama-btn-danger:hover {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+/* Modal */
+.ollama-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ollama-modal-content {
+  background: var(--app-bg-elevated, #1a1a24);
+  border: 1px solid var(--app-border-subtle, #2a2a35);
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.ollama-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--app-border-subtle, #2a2a35);
+}
+
+.ollama-modal-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-text-primary, #fff);
+}
+
+.ollama-modal-header button {
+  background: transparent;
+  border: none;
+  color: var(--app-text-muted, #999);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.ollama-modal-header button:hover {
+  color: var(--app-text-primary, #fff);
+}
+
+.ollama-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ollama-modal-body label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--app-text-muted, #999);
+  margin-top: 8px;
+}
+
+.ollama-modal-body input,
+.ollama-modal-body select {
+  background: var(--app-bg-base, #0a0a12);
+  border: 1px solid var(--app-border-subtle, #2a2a35);
+  color: var(--app-text-primary, #fff);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.ollama-modal-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--app-text-muted, #999);
+}
+
+.ollama-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--app-border-subtle, #2a2a35);
+}
+
+.ollama-modal-actions button {
+  background: var(--app-bg-base, #0a0a12);
+  border: 1px solid var(--app-border-subtle, #2a2a35);
+  color: var(--app-text-secondary, #ccc);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.ollama-modal-actions button:hover {
+  background: var(--app-bg-hover, #2a2a35);
+}
+
+.ollama-btn-primary {
+  background: #60a5fa !important;
+  color: #0a0a12 !important;
+  border-color: #60a5fa !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.ollama-btn-primary:hover {
+  background: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Status Bar (warning/success) */
+.ollama-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--app-border-subtle);
+}
+
+.ollama-status-bar code {
+  background-color: var(--app-bg-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 12px;
+}
+
+.ollama-status-bar.success {
+  background-color: rgba(46, 160, 67, 0.1);
+  color: #7ee787;
+}
+
+.ollama-status-bar.warning {
+  background-color: rgba(210, 153, 34, 0.1);
+  color: #d29922;
+}
+
+.ollama-status-bar .inline {
+  display: inline;
+  vertical-align: middle;
+}
+
+/* Config Hint */
+.config-hint {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: var(--app-bg-base);
+  border-radius: 6px;
+  border: 1px solid var(--app-border-subtle);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.config-hint p {
+  margin: 0 0 8px 0;
+  color: var(--app-text-primary);
+}
+
+.config-hint ol {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--app-text-muted);
+}
+
+.config-hint code {
+  background-color: var(--app-bg-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 11px;
+  color: #79c0ff;
+}
+
+/* Empty State Hint */
+.empty-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: rgba(210, 153, 34, 0.1);
+  border: 1px solid rgba(210, 153, 34, 0.3);
+  border-radius: 6px;
+  color: #d29922;
+}
+
+/* --- Metrics Badge --- */
+.ollama-metrics-badge {
+  font-size: 11px;
+  color: var(--app-text-muted);
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+/* --- Split Screen Mode --- */
+.ollama-split-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ollama-chat-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--app-border-subtle);
+}
+
+.ollama-chat-column:last-child {
+  border-right: none;
+}
+
+.ollama-chat-column .ollama-chat-area {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.ollama-split-header {
+  background-color: var(--app-bg-elevated);
+  border-bottom: 1px solid var(--app-border-subtle);
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--app-text-primary);
+  display: flex;
+  justify-content: center;
+  font-weight: 600;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- History Sidebar --- */
+.ollama-content-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ollama-history-sidebar {
+  width: 300px;
+  background-color: var(--app-bg-elevated);
+  border-right: 1px solid var(--app-border-subtle);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ollama-history-sidebar h3 {
+  margin: 0;
+  padding: 16px;
+  font-size: 14px;
+  color: var(--app-text-primary);
+  border-bottom: 1px solid var(--app-border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ollama-history-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--app-border-subtle);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ollama-history-item:hover {
+  background-color: var(--app-bg-hover);
+}
+
+.ollama-history-item-title {
+  font-size: 13px;
+  color: var(--app-text-primary);
+  font-weight: 500;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ollama-history-item-meta {
+  font-size: 11px;
+  color: var(--app-text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* --- Typing Animation --- */
+.typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 20px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background-color: var(--accent-secondary);
+  border-radius: 50%;
+  animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing-bounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* --- Think Box (DeepSeek R1 Reasoning) --- */
+.think-box {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--accent-secondary);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.think-box summary {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-secondary);
+  cursor: pointer;
+  user-select: none;
+  background-color: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.think-box summary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--app-text-primary);
+}
+
+.think-content {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--app-text-muted);
+  font-family: 'SF Mono', Monaco, monospace;
+  white-space: pre-wrap;
+  border-top: 1px solid var(--app-border-subtle);
+}
+
+.think-box.streaming summary {
+  color: var(--accent-secondary);
+  animation: pulse-text 2s infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* AI Chat Input Premium */
+.ai-chat-input-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  transition: background-color 0.5s;
+}
+.ai-chat-input-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--app-bg-elevated);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 1rem;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+.ai-chat-input-container.expanded {
+  border-color: var(--app-border-hover);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+.ai-chat-input-container.collapsed {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+.ai-chat-input-container.collapsed:hover {
+  border-color: var(--app-border-hover);
+}
+.ai-chat-input-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+}
+.ai-chat-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.ai-chat-btn-command {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border-radius: 0.75rem;
+  background-color: var(--app-bg-surface);
+  color: var(--app-text-muted);
+  border: 1px solid var(--app-border-subtle);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  user-select: none;
+}
+.ai-chat-form {
+  position: relative;
+  flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.ai-chat-textarea {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  color: var(--app-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  z-index: 10;
+  resize: none;
+}
+.ai-chat-textarea::placeholder {
+  color: transparent;
+}
+.ai-chat-placeholder-wrapper {
+  position: absolute;
+  inset: 0 0 0 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  overflow: hidden;
+  user-select: none;
+  padding-right: 16px;
+  width: 100%;
+}
+.ai-chat-placeholder {
+  color: var(--app-text-muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
+}
+.ai-chat-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-end;
+}
+.ai-chat-btn-attach {
+  padding: 8px;
+  color: var(--app-text-muted);
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+@media (min-width: 640px) {
+  .ai-chat-btn-attach { display: flex; }
+}
+.ai-chat-btn-attach:hover {
+  color: var(--app-text-primary);
+  background-color: var(--app-bg-surface);
+}
+.ai-chat-btn-attach.mobile-only {
+  display: flex;
+}
+@media (min-width: 640px) {
+  .ai-chat-btn-attach.mobile-only { display: none; }
+}
+.ai-chat-btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  border: 1px solid var(--app-border-subtle);
+}
+.ai-chat-btn-submit.active {
+  background-color: var(--app-text-primary);
+  color: var(--app-bg-elevated);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.ai-chat-btn-submit.disabled {
+  background-color: var(--app-bg-surface);
+  color: var(--app-text-muted);
+  cursor: not-allowed;
+}
+.ai-chat-expanded-tray {
+  overflow: hidden;
+  width: 100%;
+}
+.ai-chat-tray-inner {
+  border-top: 1px solid var(--app-border-subtle);
+  padding-top: 12px;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .ai-chat-tray-inner { flex-direction: row; align-items: center; }
+}
+.ai-chat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--app-bg-surface);
+  padding: 4px;
+  border-radius: 0.75rem;
+  border: 1px solid var(--app-border-subtle);
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .ai-chat-tabs { width: auto; }
+}
+.ai-chat-tab {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  user-select: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+@media (min-width: 640px) {
+  .ai-chat-tab { flex: none; padding: 4px 12px; }
+}
+.ai-chat-tab.active {
+  color: var(--app-text-primary);
+}
+.ai-chat-tab.inactive {
+  color: var(--app-text-muted);
+}
+.ai-chat-tab.inactive:hover {
+  color: var(--app-text-secondary);
+}
+.ai-chat-tab-active-bg {
+  position: absolute;
+  inset: 0 0 0 0;
+  background-color: var(--app-bg-elevated);
+  border: 1px solid var(--app-border-hover);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.ai-chat-tab-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.ai-chat-tab-content .active-icon {
+  color: var(--app-text-primary);
+}
+.ai-chat-tray-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  .ai-chat-tray-tools { width: auto; }
+}
+.ai-chat-model-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  background-color: var(--app-bg-surface);
+  padding: 6px 10px;
+  border-radius: 0.75rem;
+  border: 1px solid var(--app-border-subtle);
+  user-select: none;
+  margin-left: auto;
+}
+@media (min-width: 640px) {
+  .ai-chat-model-badge { margin-left: 0; }
+}
+
+/* ============================================================
+   KOTHAR AVATAR - Letra "K" com animações rotativas
+   ============================================================ */
+
+.ollama-avatar-bot {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: visible;
+}
+
+.ollama-avatar-k {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-weight: 800;
+  font-size: 14px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animações que rotacionam - cada uma com feel diferente */
+
+/* Estado padrão: estática */
+.k-static {
+  /* sem animação */
+}
+
+/* 1. Spin lento */
+.k-spin-slow {
+  animation: k-spin-slow 8s linear infinite;
+}
+
+@keyframes k-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 2. Pulse glow (brilho pulsante) */
+.k-pulse-glow {
+  animation: k-pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes k-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(52, 211, 153, 0);
+    transform: scale(1.05);
+  }
+}
+
+/* 3. Float up/down */
+.k-float-up,
+.k-float-down {
+  animation: k-float 3s ease-in-out infinite;
+}
+
+@keyframes k-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* 4. Wiggle */
+.k-wiggle {
+  animation: k-wiggle 1.5s ease-in-out infinite;
+}
+
+@keyframes k-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+/* 5. Breathe (respiração - opacity pulsante) */
+.k-breathe {
+  animation: k-breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes k-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* ============================================================
+   MENSAGEM - SEM fundo para assistant (clean mode)
+   ============================================================ */
+
+.ollama-message-bubble--clean {
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 0 !important;
+}
+
+.ollama-message-bubble--clean:hover {
+  background: transparent !important;
+}
+
+/* ============================================================
+   TYPING INDICATOR
+   ============================================================ */
+
+.ollama-typing-indicator {
+  display: flex;
+  gap: 12px;
+  max-width: 800px;
+  margin: 0 auto 16px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.ollama-typing-bubble {
+  background: transparent;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--app-text-muted, #999);
+  font-size: 12px;
+}
+
+.ollama-typing-dot {
+  width: 6px;
+  height: 6px;
+  background: #34d399;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+@keyframes typing-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ollama-typing-text {
+  font-size: 12px;
+  color: var(--app-text-muted, #999);
+  font-style: italic;
+}
+
+/* Inline typing dots (dentro do balão quando última msg é vazia) */
+.ollama-typing-dots-inline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 24px;
+}
+
+.ollama-typing-dots-inline span {
+  width: 6px;
+  height: 6px;
+  background: #34d399;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.ollama-typing-dots-inline span:nth-child(1) { animation-delay: -0.32s; }
+.ollama-typing-dots-inline span:nth-child(2) { animation-delay: -0.16s; }
+
+/* Markdown Content Styling */
+.marked-content p {
+  margin-bottom: 0.75rem;
+}
+.marked-content p:last-child {
+  margin-bottom: 0;
+}
+.marked-content ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.marked-content ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.marked-content li {
+  margin-bottom: 0.25rem;
+}
+.marked-content strong {
+  font-weight: 600;
+  color: #fff;
+}
+.marked-content em {
+  font-style: italic;
+}
+
+/* Metrics Footer Styling */
+.ollama-message-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--app-text-muted, #8b949e);
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.ollama-metric-text {
+  opacity: 0.8;
+}
+
+.ollama-metric-divider {
+  opacity: 0.5;
+}
+
+.ollama-action-link {
+  background: transparent;
+  border: none;
+  color: var(--app-text-muted, #8b949e);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: inherit;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ollama-action-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--app-text-primary, #fff);
+}
+
+/* Interactive Mini Menu Buttons */
+.ollama-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--app-border-subtle);
+  color: var(--app-text-muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.ollama-menu-btn:hover:not(:disabled) {
+  background: var(--app-bg-hover);
+  color: var(--app-text-primary);
+  border-color: var(--app-text-muted);
+}
+
+.ollama-menu-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Red hover for danger buttons */
+.ollama-menu-btn.danger:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+/* === KOTHAR v6.0 SUPREMO === */
+.ollama-menu-btn.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.ollama-memory-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 4px;
+  color: #a5b4fc;
+}
+
+.ollama-config-panel label {
+  display: block;
+  font-size: 11px;
+  color: var(--app-text-muted);
+  margin-bottom: 4px;
+}
+
+.ollama-config-panel input[type="range"] {
+  height: 4px;
+  background: var(--app-bg-hover);
+  border-radius: 2px;
+  appearance: none;
+  outline: none;
+}
+
+.ollama-config-panel input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #10b981;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* ============================================================
+   ARTIFACT CANVAS (Preview + Code)
+   ============================================================ */
+
+.ollama-code-modal.canvas-mode {
+  width: 90%;
+  max-width: 1400px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.artifact-tabs {
+  display: flex;
+  gap: 16px;
+}
+
+.artifact-tab {
+  background: transparent;
+  border: none;
+  color: var(--app-text-muted, #8b949e);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.artifact-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--app-text-primary, #fff);
+}
+
+.artifact-tab.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.artifact-filename {
+  font-weight: 600;
+  color: #fff;
+}
+
+.artifact-content-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-bg-default, #000);
+}
+
+.artifact-preview {
+  flex: 1;
+  overflow: auto;
+  background: #fff; /* White background for previews by default */
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.artifact-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.artifact-markdown {
+  padding: 24px;
+  color: #000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.artifact-markdown h1, .artifact-markdown h2, .artifact-markdown h3 {
+  color: #111;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.artifact-markdown p {
+  color: #333;
+  line-height: 1.6;
+}
+
+.artifact-markdown code {
+  background: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: #ef4444;
+}
+
+.artifact-save-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: var(--app-bg-surface);
+  border-bottom: 1px solid var(--app-border-subtle);
+  font-size: 12px;
+}
+
+.artifact-save-panel select {
+  background: var(--app-bg-hover);
+  color: #fff;
+  border: 1px solid var(--app-border-subtle);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+

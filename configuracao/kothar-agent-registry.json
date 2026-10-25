@@ -1,0 +1,76 @@
+{
+  "version": 2,
+  "name": "kothar-agent-registry",
+  "sourceOfTruth": "docs/KOTHAR-NUCLEO-DESIGN.md",
+  "defaults": {
+    "mode": "manual",
+    "requireBlueprint": true,
+    "requireIndependentReview": true,
+    "requireSecurityGate": true,
+    "requireEvidence": true
+  },
+  "profiles": {
+    "minimal": ["core", "triage", "security", "code-reviewer", "qa", "agent-evaluator"],
+    "core": ["core", "triage", "security", "code-reviewer", "qa", "agent-evaluator", "architect", "code-explorer", "engineer", "frontend", "backend", "devops", "memory"],
+    "full": ["core", "triage", "security", "code-reviewer", "qa", "agent-evaluator", "architect", "code-explorer", "engineer", "frontend", "backend", "devops", "memory", "supervisor", "chief-of-staff", "code-architect", "api-designer", "build-error-resolver", "e2e-runner", "a11y-architect", "dpo", "disaster-recovery", "data-engineer", "data-scientist", "database-admin", "product-manager", "copywriter", "ads-copywriter", "seo", "ui-artist", "tech-writer", "structure", "session-archivist"]
+  },
+  "routing": {
+    "discovery": ["triage", "architect", "product-manager", "seo"],
+    "architecture": ["architect", "code-architect", "code-explorer", "api-designer"],
+    "frontend": ["frontend", "ui-artist", "a11y-architect", "seo"],
+    "seo": ["seo", "frontend", "copywriter", "a11y-architect", "e2e-runner", "devops"],
+    "backend": ["backend", "database-admin", "data-engineer"],
+    "security": ["security", "dpo", "disaster-recovery"],
+    "quality": ["code-reviewer", "qa", "agent-evaluator"],
+    "operations": ["devops", "build-error-resolver", "session-archivist"],
+    "memory": ["memory", "chief-of-staff"]
+  },
+  "skillRouting": {
+    "marketing": {
+      "requiredContext": ["contexto-produto-marketing"],
+      "routes": [
+        {
+          "agent": "product-manager",
+          "skills": ["contexto-produto-marketing", "marketing-estrategia"],
+          "handoffTo": ["copywriter", "ads-copywriter", "frontend"]
+        },
+        {
+          "agent": "copywriter",
+          "skills": ["contexto-produto-marketing", "marketing-estrategia"],
+          "handoffTo": ["code-reviewer", "agent-evaluator"]
+        },
+        {
+          "agent": "ads-copywriter",
+          "skills": ["contexto-produto-marketing", "marketing-estrategia"],
+          "handoffTo": ["qa", "agent-evaluator"]
+        },
+        {
+          "agent": "frontend",
+          "skills": ["contexto-produto-marketing", "frontend-ugarit-ui"],
+          "handoffTo": ["a11y-architect", "e2e-runner", "agent-evaluator"]
+        }
+      ],
+      "optionalSkills": [
+        "customer-research",
+        "copywriting",
+        "cro",
+        "ab-testing",
+        "analytics",
+        "seo-audit",
+        "ai-seo",
+        "pricing",
+        "launch",
+        "marketing-plan"
+      ]
+    }
+  },
+  "mandatoryGates": [
+    "project",
+    "context",
+    "scope",
+    "security",
+    "review",
+    "tests",
+    "dod"
+  ]
+}

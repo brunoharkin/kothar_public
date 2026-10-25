@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "obsidian-mcp-complete": {
+      "command": "node",
+      "args": ["/home/bruno-harkin/obsidian-mcp/dist/stdio.js"],
+      "env": {
+        "OBSIDIAN_VAULT_PATH": "/home/bruno-harkin/Cofre",
+        "OBSIDIAN_MEMORY_FOLDER": "00_Memoria"
+      }
+    },
+    "youtube-scrap": {
+      "command": "node",
+      "args": ["/home/bruno-harkin/.gemini/config/youtube-wrapper.js"]
+    }
+  },
+  "settings": {
+    "obsidian": {
+      "vaultPath": "/home/bruno-harkin/Cofre",
+      "memoryFolder": "00_Memoria",
+      "memoryStructure": "YYYY-MM/YYYY-MM-DD.md",
+      "dailyNotesFolder": "Diarias",
+      "autoSync": true,
+      "syncInterval": 300000,
+      "maxContextNotes": 5,
+      "searchDepth": "semantic"
+    },
+    "kothar": {
+      "name": "Kothar",
+      "version": "1.1.0",
+      "created": "2026-05-24",
+      "location": "/home/bruno-harkin/Cofre/01_Kothar"
+    }
+  }
+}

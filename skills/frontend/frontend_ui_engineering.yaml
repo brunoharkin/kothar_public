@@ -1,0 +1,47 @@
+# ===========================================================
+# KOTHAR SKILL — Engenharia de Interface UI (Acessibilidade & Qualidade)
+# Arquiteto & Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# Baseado nos Padrões Ouro de Front-End e Prevenção do "AI Aesthetic".
+# Esta skill DEVE ser invocada sempre que o agente gerar código
+# React, Vue, HTML/CSS ou Tailwind.
+# ===========================================================
+
+name: frontend_ui_engineering
+description: |
+  Mandatos rigorosos de qualidade, acessibilidade e arquitetura para Engenharia 
+  de UI. Define as restrições que diferenciam código de IA amador de código 
+  de nível sênior (Vale do Silício).
+
+mandates:
+  - ANTI_AI_AESTHETIC: Proibido o uso de gradientes excessivos, roxo/índigo genérico (padrão de IA), sombras pesadas e padding aleatório.
+  - STRICT_COLOR_HARMONY: Em temas escuros (Dark Mode), use tons profundos e elegantes (como Zinc-900, Slate-950, #09090b, #111111). Nunca use "azul escuro padrão" ou roxo brilhante que grite "IA". A paleta deve ser rigorosamente harmoniosa.
+  - NO_EMOJI_ICONS: É ESTRITAMENTE PROIBIDO usar emojis de texto (como 📊, ⚙️, 🕸️) como ícones de UI. Sempre use bibliotecas profissionais como Lucide React, Phosphor Icons ou Radix Icons.
+  - INTERACTIVE_LAYOUTS: Interfaces devem parecer "vivas". É obrigatório o uso de micro-interações, estados de hover sutis, foco claro, animações de entrada fluidas (framer-motion) e feedback tátil em botões.
+  - STRICT_SPACING: Use a escala do Design System (ex: Tailwind `p-4`, `gap-3`). Nunca invente valores "arbitrários" como 2.3rem.
+  - COMPONENT_SIZE: Nenhum componente deve exceder 200 linhas. Se exceder, divida em componentes menores.
+  - WCAG_2_1_AA: Todos os elementos interativos DEVEM ter foco (keyboard navigation) e atributos `aria-label` quando não houver texto visível.
+  - NO_BLANK_STATES: Sempre trate Loading States (via Skeleton, não spinners gigantes) e Empty/Error States com ilustrações ou ícones semânticos (não emojis).
+  - BEHAVIORAL_UI: Consulte obrigatóriamente o `behavioral_conversion_guidelines.md` para garantir que as interfaces utilizem a Lei de Hick (baixa carga cognitiva em formulários) e o Efeito Zeigarnik (barras de progresso/onboarding).
+  - STRICT_DESIGN_MD_COMPLIANCE: É estritamente proibido inventar estilos (cores, padding, fontes). Você DEVE procurar e obedecer cegamente ao arquivo `DESIGN.md` na raiz do projeto. Consulte o `opendesign_workspace_guidelines.md`.
+
+capabilities:
+  - "Advanced React Architecture"
+  - "WCAG 2.1 AA Accessibility Validation"
+  - "Design System Consistency"
+  - "Behavioral UI & Conversion Rate Optimization (CRO)"
+
+usage_guidelines:
+  - TYPOGRAPHY: Respeite a hierarquia H1 -> H2 -> H3. Nunca pule níveis e nem use headings apenas por "estilo" (se precisar de texto grande não-semântico, use classes de fonte e não tags de heading).
+  - STATE_MANAGEMENT: Use a abordagem mais simples possível:
+      1. Local state (useState) para UI.
+      2. Lifted state para 2-3 irmãos.
+      3. Context apenas para Auth/Theme/Locale.
+      4. Server state (React Query/SWR) para chamadas externas.
+      Evite prop drilling com mais de 3 níveis de profundidade.
+  - RESPONSIVENESS: Mobile First SEMPRE. Defina `grid-cols-1`, depois `sm:grid-cols-2`, `lg:grid-cols-3`. Teste mentalmente em 320px, 768px e 1024px.
+  - FOCUS_MANAGEMENT: Em modais e diálogos, crie "Focus Traps" (prender o tab dentro do modal) e restaure o foco ao fechar. Em `divs` clicáveis, SEMPRE inclua `role="button"`, `tabIndex={0}` e trate `onKeyDown` para Space e Enter (ou apenas use a tag `<button>`).
+
+orchestration:
+  - O Maestro deve instruir o QA Agent a verificar a adesão a essas regras no código gerado pelo Engineer.
+  - Se o Engineer gerar um componente que não navega por teclado (Tab) ou não possui Empty States para listas vazias, o código DEVE ser rejeitado.

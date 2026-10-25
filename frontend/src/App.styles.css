@@ -1,0 +1,380 @@
+
+/**
+ * KOTHAR v4.0 — App Shell Styles
+ * Sidebar premium com glassmorphism e navegação moderna
+ */
+
+/* ============================================
+   PALETA - Minimalista escuro + azul/verde
+   ============================================ */
+
+:root {
+  --app-sidebar-bg: rgba(10, 10, 15, 0.95);
+  --app-sidebar-border: rgba(255, 255, 255, 0.06);
+  --app-text-primary: #f5f5f7;
+  --app-text-secondary: #b4b4be;
+  --app-text-muted: #6b6b78;
+  --app-text-faint: #4a4a55;
+  --app-bg-base: #0a0a0f;
+  --app-bg-elevated: #11111a;
+  --app-bg-card: #15151f;
+  --app-bg-hover: rgba(255, 255, 255, 0.04);
+  --app-border-subtle: rgba(255, 255, 255, 0.06);
+
+  /* Apenas duas cores de destaque - azul/verde ChronoDesk */
+  --accent-primary: #3b82f6;    /* Azul */
+  --accent-secondary: #22c55e;  /* Verde */
+}
+
+/* ============================================
+   SHELL
+   ============================================ */
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  background: var(--app-bg-base);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  color: var(--app-text-primary);
+  overflow: hidden;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+.app-sidebar {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-sidebar-bg);
+  border-right: 1px solid var(--app-sidebar-border);
+  position: relative;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+/* ============================================
+   HEADER (Logo)
+   ============================================ */
+
+.app-sidebar-header {
+  padding: 1.25rem 1.25rem 1rem;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-logo-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-bg-elevated);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 8px;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.app-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.app-logo-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--app-text-primary);
+}
+
+.app-logo-version {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--app-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   SEARCH HINT
+   ============================================ */
+
+.app-search-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0 1.25rem 0.5rem;
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+  cursor: pointer;
+}
+
+.app-search-hint:hover {
+  background: var(--app-bg-elevated);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--app-text-secondary);
+}
+
+.app-search-hint > span {
+  flex: 1;
+}
+
+.app-search-hint kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  padding: 0.125rem 0.375rem;
+  background: var(--app-bg-elevated);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 4px;
+  color: var(--app-text-secondary);
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+
+.app-nav {
+  flex: 1;
+  padding: 0.75rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.app-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+
+.app-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.app-nav-group-title {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--app-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Nav Item */
+.app-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.app-nav-item:hover:not(.app-nav-item--disabled) {
+  background: var(--app-bg-hover);
+}
+
+.app-nav-item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Active indicator (left bar) */
+.app-nav-item-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Icon */
+.app-nav-item-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.app-nav-item--active .app-nav-item-icon {
+  background: var(--app-bg-hover);
+}
+
+/* Content */
+.app-nav-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.app-nav-item-label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-nav-item-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--app-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.app-nav-item--active .app-nav-item-label {
+  color: var(--app-text-primary);
+}
+
+.app-nav-item-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.app-nav-item-description {
+  font-size: 0.7rem;
+  color: var(--app-text-muted);
+  font-weight: 500;
+}
+
+/* Arrow */
+.app-nav-item-arrow {
+  width: 14px;
+  height: 14px;
+  color: var(--app-text-muted);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 200ms;
+  flex-shrink: 0;
+}
+
+.app-nav-item-arrow--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ============================================
+   FOOTER (Status)
+   ============================================ */
+
+.app-sidebar-footer {
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid var(--app-sidebar-border);
+}
+
+.app-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 6px;
+}
+
+.app-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--app-text-secondary);
+}
+
+.app-status-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-secondary);
+  border-radius: 50%;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.app-status-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-secondary);
+}
+
+.app-status-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.7rem;
+  color: var(--app-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ============================================
+   MAIN
+   ============================================ */
+
+.app-main {
+  flex: 1;
+  overflow: hidden;
+  background: var(--app-bg-base);
+  position: relative;
+}
+
+.app-page {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .app-sidebar {
+    width: 240px;
+  }
+}

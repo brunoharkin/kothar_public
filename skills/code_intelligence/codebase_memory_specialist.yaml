@@ -1,0 +1,106 @@
+---
+name: Codebase Intelligence Specialist
+description: Usa Codebase Memory MCP para análise estrutural de código, detecção de dependências e queries Cypher no grafo de código.
+category: code_intelligence
+when_to_use: |
+  Quando precisar:
+  - Analisar arquitetura de um projeto
+  - Rastrear dependências entre funções/classes
+  - Detectar código morto ou dependências circulares
+  - Entender impacto de mudanças
+  - Buscar símbolos específicos no código
+  - Executar queries Cypher no grafo de código
+
+instructions: |
+  ## Codebase Memory MCP (CBM)
+
+  O CBM é um servidor MCP de código inteligente que indexa codebases em um grafo de conhecimento.
+
+  ### Instalação
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash
+  ```
+
+  ### Indexação
+  ```bash
+  # Indexa repositório atual
+  codebase-memory-mcp cli index_repository --repo-path .
+
+  # Lista projetos indexados
+  codebase-memory-mcp cli list_projects
+
+  # Status de indexação
+  codebase-memory-mcp cli index_status --project meu-projeto
+  ```
+
+  ### Queries Estruturadas
+  ```bash
+  # Busca símbolos por nome
+  codebase-memory-mcp cli search_graph --project meu-projeto --query "auth"
+
+  # Rastreia dependências
+  codebase-memory-mcp cli trace_path --project meu-projeto --function-name "authenticate" --direction both
+
+  # Query Cypher
+  codebase-memory-mcp cli query_graph --project meu-projeto --query "MATCH (f:Function) RETURN f"
+  ```
+
+  ### Análise
+  ```bash
+  # Resumo da arquitetura
+  codebase-memory-mcp cli get_architecture --project meu-projeto
+
+  # Schema do grafo
+  codebase-memory-mcp cli get_graph_schema --project meu-projeto
+
+  # Detecta mudanças git
+  codebase-memory-mcp cli detect_changes --project meu-projeto --git-diff "@{1}"
+  ```
+
+  ### No Python (via Kothar)
+  ```python
+  from backend.code_intelligence import CBMClient, QueryEngine
+
+  cbm = CBMClient()
+  engine = QueryEngine(cbm)
+
+  # Busca funções
+  functions = engine.find_functions_by_name("meu-projeto", "handler")
+
+  # Rastreia dependências
+  callers = engine.get_callers("meu-projeto", "process_request")
+
+  # Detecta código morto
+  dead = engine.find_dead_functions("meu-projeto")
+  ```
+
+triggers:
+  - "analisar código"
+  - "dependências"
+  - "arquitetura"
+  - "código morto"
+  - "impacto de mudança"
+  - "call graph"
+  - "query cypher"
+  - "buscar função"
+  - "buscar classe"
+  - "rastrear chamadas"
+
+locks:
+  - id: no_cbm_query
+    description: Sempre consulte o grafo de código via CBM antes de modificar funções críticas
+    rule: Execute `codebase-memory-mcp cli trace_path` para entender o contexto antes de editar
+
+metadata:
+  version: "1.0"
+  author: "Engenheiro Kothar"
+  tags: [code-intelligence, graph, dependencies, cypher, ast]
+  tools:
+    - index_repository
+    - search_graph
+    - trace_path
+    - query_graph
+    - get_architecture
+    - detect_changes
+    - find_dead_code
+    - circular_dependencies

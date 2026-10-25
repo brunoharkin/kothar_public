@@ -1,0 +1,44 @@
+name = "kothar"
+description = "Kothar v3.0 - Sistema de Orquestração de Agentes. Verifica sistema e ativa orquestração completa."
+
+[[commands]]
+name = "kothar"
+description = "Ativar Kothar v3.0 com verificação completa"
+command = "bash"
+args = ["-c", "/home/bruno-harkin/kothar/scripts/kothar-cli.sh activate"]
+
+[[commands]]
+name = "kothar-status"
+description = "Status completo do sistema Kothar"
+command = "bash"
+args = ["-c", "/home/bruno-harkin/kothar/scripts/kothar-cli.sh status"]
+
+[[commands]]
+name = "kothar-health"
+description = "Verificar saúde do sistema Kothar"
+command = "bash"
+args = ["-c", "/home/bruno-harkin/kothar/scripts/kothar-cli.sh health"]
+
+[[commands]]
+name = "kothar-fix"
+description = "Verificar e corrigir problemas do Kothar"
+command = "bash"
+args = ["-c", "/home/bruno-harkin/kothar/scripts/kothar-cli.sh fix"]
+
+[[commands]]
+name = "kothar-start"
+description = "Iniciar gravação de sessão Kothar"
+command = "bash"
+args = ["-c", "/home/bruno-harkin/kothar/scripts/kothar-cli.sh start"]
+
+[[commands]]
+name = "kothar-stop"
+description = "Parar gravação de sessão Kothar"
+command = "bash"
+args = ["-c", "/home/bruno-harkin/kothar/scripts/kothar-cli.sh stop"]
+
+[[commands]]
+name = "kothar-ports"
+description = "Verificar portas em uso"
+command = "bash"
+args = ["-c", "lsof -i :2785 -i :2786 -i :3000 -i :5432 -i :5433 -i :5440 2>/dev/null || echo 'Nenhuma porta em uso'"]

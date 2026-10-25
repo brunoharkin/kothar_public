@@ -1,0 +1,301 @@
+networks:
+  kothar_net:
+    driver: bridge
+    name: kothar_net
+
+volumes:
+  kothar_postgres_data: null
+  kothar_redis_data: null
+  kothar_neo4j_data: null
+  kothar_chroma_data: null
+  kothar_ollama_data: null
+
+services:
+  kothar_postgres:
+    image: postgres:16-alpine
+    container_name: kothar_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kothar}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kothar_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-kothar_trace}
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512m
+    volumes:
+    - kothar_postgres_data:/var/lib/postgresql/data
+    - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+    - ${POSTGRES_PORT:-5440}:5432
+    networks:
+    - kothar_net
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U ${POSTGRES_USER:-kothar}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kothar_redis:
+    image: redis:7-alpine
+    container_name: kothar_redis
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD:-kothar_redis}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256m
+    volumes:
+    - kothar_redis_data:/data
+    - ./infra/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+    - ${REDIS_PORT:-6381}:6379
+    networks:
+    - kothar_net
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - --no-auth-warning
+      - -a
+      - ${REDIS_PASSWORD:-kothar_redis}
+      - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kothar_neo4j:
+    image: neo4j:5-community
+    container_name: kothar_neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-kothar_neo4j}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_apoc_export_file_enabled: 'true'
+      NEO4J_apoc_import_file_enabled: 'true'
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1g
+    volumes:
+    - kothar_neo4j_data:/data
+    - ./infra/neo4j:/var/lib/neo4j/import
+    - ./infra/neo4j/backup.sh:/backup.sh:ro
+    ports:
+    - ${NEO4J_HTTP_PORT:-7474}:7474
+    - ${NEO4J_BOLT_PORT:-7687}:7687
+    networks:
+    - kothar_net
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - --no-verbose
+      - --tries=1
+      - --spider
+      - http://localhost:7474
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      kothar_postgres:
+        condition: service_healthy
+
+  kothar_chromadb:
+    image: chromadb/chroma:latest
+    container_name: kothar_chromadb
+    restart: unless-stopped
+    environment:
+      CHROMA_SERVER_HOST: 0.0.0.0
+      CHROMA_SERVER_CORS_ALLOW_ANY_ORIGIN: 'True'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512m
+    volumes:
+    - kothar_chroma_data:/chroma/chroma
+    ports:
+    - ${CHROMA_PORT:-8000}:8000
+    networks:
+    - kothar_net
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - "bash -c 'echo > /dev/tcp/127.0.0.1/8000'"
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      kothar_postgres:
+        condition: service_healthy
+
+  kothar_ollama:
+    image: ollama/ollama:latest
+    container_name: kothar_ollama
+    restart: unless-stopped
+    environment:
+      OLLAMA_KEEP_ALIVE: "0"
+    volumes:
+    - kothar_ollama_data:/root/.ollama
+    ports:
+    - 11434:11434
+    networks:
+    - kothar_net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+    healthcheck:
+      test:
+      - CMD
+      - ollama
+      - list
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      kothar_postgres:
+        condition: service_healthy
+
+  kothar_scrapling_mcp:
+    image: pyd4vinci/scrapling:latest
+    container_name: kothar_scrapling_mcp
+    restart: unless-stopped
+    command:
+    - mcp
+    - --http
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8000'
+    - --no-auth
+    ports:
+    - 8005:8000
+    networks:
+    - kothar_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256m
+
+  kothar_harness_api:
+    build:
+      context: ./backend/harness-api
+      dockerfile: Dockerfile
+    container_name: kothar_harness_api
+    restart: unless-stopped
+    env_file: ./backend/harness-api/.env
+    environment:
+    - DB_PATH=/app/banco/traces.db
+    - DB_HOST=kothar_postgres
+    - DB_PORT=5432
+    - DB_USER=${POSTGRES_USER:-kothar}
+    - DB_PASSWORD=${POSTGRES_PASSWORD:-kothar_secret}
+    - DB_NAME=${POSTGRES_DB:-kothar_trace}
+    volumes:
+    - ./backend/harness-api/banco:/app/banco
+    ports:
+    - 3000:3000
+    networks:
+    - kothar_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - --no-verbose
+      - --tries=1
+      - --spider
+      - http://localhost:3000/health
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      kothar_postgres:
+        condition: service_healthy
+
+  kothar_api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kothar_api
+    restart: unless-stopped
+    env_file: .env
+    command: '/usr/local/bin/python -m uvicorn backend.api.main:app --host 0.0.0.0 --port 8080 --reload'
+    environment:
+    - PYTHONUNBUFFERED=1
+    - PATH=/usr/local/bin:/usr/bin:/bin:${PATH}
+    - CBM_API_URL=http://host.docker.internal:9749
+    volumes:
+    - ./backend:/app/backend
+    - ./skills:/app/skills
+    - ./.env:/app/.env:ro
+    - ./infra:/app/infra:ro
+    - ${VAULT_PATH:-/home/bruno/cofre}:/vault:ro
+    - /opt/apps/cofre:/opt/apps/cofre:ro
+    - /home/bruno/.local/bin:/home/bruno/.local/bin:ro
+    - /home/bruno/.cache/codebase-memory-mcp:/home/bruno/.cache/codebase-memory-mcp:ro
+    - /home/bruno/.config/codebase-memory-mcp:/home/bruno/.config/codebase-memory-mcp:ro
+    - ./scripts:/app/scripts
+    - ./Cofre:/home/bruno-harkin/Cofre:ro
+    - ../orby:/app/apps/orby:ro
+    - ../crm-Sophia:/app/apps/crm-Sophia:ro
+    - ../chronodesk:/app/apps/chronodesk:ro
+    extra_hosts:
+    - host.docker.internal:host-gateway
+    ports:
+    - ${API_PORT:-8080}:8080
+    networks:
+    - kothar_net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512m
+    depends_on:
+      kothar_postgres:
+        condition: service_healthy
+      kothar_redis:
+        condition: service_healthy
+      kothar_neo4j:
+        condition: service_healthy
+      kothar_chromadb:
+        condition: service_healthy
+
+  kothar_frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kothar_frontend
+    restart: unless-stopped
+    ports:
+    - ${FRONTEND_PORT:-3030}:80
+    networks:
+    - kothar_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256m
+    depends_on:
+      kothar_harness_api:
+        condition: service_healthy
+      kothar_api:
+        condition: service_started

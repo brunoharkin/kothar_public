@@ -1,0 +1,53 @@
+---
+name: kothar-security-audit-skill
+description: Skill obrigatório para auditoria de segurança em cada tarefa
+metadata:
+  type: reference
+---
+
+# SKILL: Auditoria de Segurança Kothar v4.0
+
+## Objetivo
+Este skill deve ser invocado em **TODA** alteração de código para garantir que as regras de segurança sejam seguidas.
+
+## Quando Usar
+- Antes de qualquer alteração em código
+- Após qualquer correção
+- Antes de commits
+- Ao trabalhar com dados sensíveis
+
+## Checklist Obrigatório
+
+### 1. Credenciais
+```
+[ ] Nenhuma credencial no código
+[ ] Nenhum token em localStorage
+[ ] Nenhum password em comentários
+[ ] API keys apenas no backend
+```
+
+### 2. Frontend
+```
+[ ] Sem exposição de portas
+[ ] Sem IPs internos
+[ ] Sem dados sensíveis no estado
+[ ] Validações no backend
+```
+
+### 3. Logs
+```
+[ ] Sem logging de passwords
+[ ] Sem logging de tokens
+[ ] Sem logging de API keys
+[ ] Apenas ações de usuário
+```
+
+## Como Invocar
+```
+/kothar audit
+```
+
+## Arquivos de Referência
+- `/home/bruno/cofre/regras/kothar-regras-seguranca.md`
+- `/home/bruno/cofre/checklist/kothar-checklist-teste.md`
+- `/home/bruno/cofre/treinamento/kothar-fluxo-trabalho.md`

@@ -1,0 +1,137 @@
+# KOTHAR SKILL: Auditoria de Segurança Completa
+name: kothar-audit
+description: Auditoria completa de segurança para cada tarefa - obrigatório antes de qualquer alteração
+
+# ============================================================
+# SKILL: AUDITORIA DE SEGURANÇA KOTHAR v4.0
+# ============================================================
+# Este skill deve ser invocado em TODA alteração de código
+# ============================================================
+
+## Quando Usar
+Este skill é **OBRIGATÓRIO** e deve ser invocado:
+- Antes de qualquer alteração em código
+- Após qualquer correção
+- Antes de commits
+- Ao trabalhar com dados sensíveis
+- Ao trabalhar no frontend
+
+## Checklist de Auditoria
+
+### 1. VERIFICAÇÃO DE CREDENCIAIS
+```
+[ ] Nenhuma API key no código
+[ ] Nenhum token em localStorage/sessionStorage
+[ ] Nenhuma senha em variáveis
+[ ] Nenhum secret em comentários
+[ ] Nenhum Bearer token exposto
+[ ] AWS/GitHub keys verificadas
+```
+
+### 2. VERIFICAÇÃO DO FRONTEND
+```
+[ ] Sem exposição de portas internas
+[ ] Sem IPs hardcoded
+[ ] Sem dados sensíveis no estado
+[ ] Validações ocorrem no backend
+[ ] Sem console.log com dados sensíveis
+```
+
+### 3. VERIFICAÇÃO DE LOGGING
+```
+[ ] Sem logging de passwords
+[ ] Sem logging de tokens
+[ ] Sem logging de API keys
+[ ] Apenas ações de usuário logadas
+[ ] Sem exposição de dados na resposta
+```
+
+### 4. VERIFICAÇÃO DE IMPORTS
+```
+[ ] Nenhum import quebrado
+[ ] Todos os componentes existem
+[ ] Caminhos de import corretos
+[ ] Nenhum .env sendo commitado
+```
+
+## Como Invocar
+
+```
+/kothar audit [caminho]
+```
+
+Ou automaticamente via pre-commit hook.
+
+## Scripts Disponíveis
+
+| Script | Função |
+|--------|--------|
+| `kothar_security_audit.py` | Auditor de segurança CLI |
+| `kothar_frontend_validator.sh` | Validador de frontend |
+| `pre-commit-hook.sh` | Hook de pré-commit |
+
+## Arquivos de Referência
+
+- `/home/bruno/cofre/regras/kothar-regras-completas-v2.md`
+- `/home/bruno/cofre/checklist/kothar-checklist-teste.md`
+- `/home/bruno/cofre/treinamento/kothar-fluxo-trabalho.md`
+
+## Fluxo de Trabalho
+
+```
+1. Receber tarefa
+   ↓
+2. Executar AUDITORIA (este skill)
+   ↓
+3. Consultar RAG para código existente
+   ↓
+4. Criar plano e salvar no cofre
+   ↓
+5. Implementar (uma coisa por vez)
+   ↓
+6. Testar
+   ↓
+7. Nova auditoria
+   ↓
+8. Commit
+```
+
+## Regras de Ouro
+
+1. **SEGURANÇA PRIMEIRO** - Credenciais nunca no frontend
+2. **TESTAR SEMPRE** - Após cada alteração
+3. **RAG PRIMEIRO** - Consultar antes de criar
+4. **UMA COISA POR VEZ** - Não fazer 10 mudanças de uma vez
+5. **SALVAR PLANO** - No cofre, antes de implementar
+
+## Penalidades
+
+| Violação | Ação |
+|----------|------|
+| Credencial exposta | Reverter imediatamente |
+| Dados em localStorage | Refatorar para backend |
+| Log de senha/token | Limpar logs, rodar segurança |
+| Código quebrado | Reverter commit |
+
+## Exemplos de Violação
+
+### ❌ ERRADO
+```typescript
+// NUNCA FAÇA ISSO
+const apiKey = "sk-1234567890";
+localStorage.setItem('token', 'meu-token');
+console.log("Password:", user.password);
+```
+
+### ✅ CORRETO
+```typescript
+// SEMPRE FAÇA ISSO
+const credentials = await api.getCredentials();
+// Backend gerencia, frontend apenas exibe
+```
+
+---
+
+**Skill parte do sistema Kothar v4.0**
+**Versão: 2.0**
+**Data: 2026-09-10**

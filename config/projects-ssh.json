@@ -1,0 +1,122 @@
+{
+  "version": "1.0",
+  "description": "Registro de projetos Kothar com isolamento SSH",
+  "projects": [
+    {
+      "id": "kothar",
+      "name": "Kothar",
+      "path": "/home/bruno/kothar",
+      "ssh": {
+        "key_file": "id_ed25519_kothar",
+        "key_path": "/home/bruno/.ssh/id_ed25519_kothar",
+        "ssh_host": "github-kothar",
+        "git_remote": "git@github-kothar:agestrategia360-sudo/kothar.git",
+        "github_repo": "https://github.com/agestrategia360-sudo/kothar"
+      },
+      "env_file": "/home/bruno/.envs/kothar.env",
+      "status": "active"
+    },
+    {
+      "id": "crm-sophia",
+      "name": "CRM Sophia",
+      "path": "/home/bruno/crm-Sophia",
+      "ssh": {
+        "key_file": "id_ed25519_crm_sophia",
+        "key_path": "/home/bruno/.ssh/id_ed25519_crm_sophia",
+        "ssh_host": "github.com-crm-sophia",
+        "git_remote": "git@github.com-crm-sophia:agestrategia360-sudo/crm-Sophia.git",
+        "github_repo": "https://github.com/agestrategia360-sudo/crm-Sophia"
+      },
+      "env_file": "/home/bruno/.envs/crm_sophia.env",
+      "status": "active"
+    },
+    {
+      "id": "chronodesk",
+      "name": "ChronoDesk",
+      "path": "/home/bruno/chronodesk",
+      "ssh": {
+        "key_file": "id_ed25519_chronodesk",
+        "key_path": "/home/bruno/.ssh/id_ed25519_chronodesk",
+        "ssh_host": "github.com-chronodesk",
+        "git_remote": "git@github.com-chronodesk:agestrategia360-sudo/ChronoDesk.git",
+        "github_repo": "https://github.com/agestrategia360-sudo/ChronoDesk"
+      },
+      "env_file": "/home/bruno/.envs/chronodesk.env",
+      "status": "active"
+    },
+    {
+      "id": "orby-ia",
+      "name": "Orby.ia",
+      "path": "/home/bruno/Orby.ia",
+      "ssh": {
+        "key_file": "id_ed25519_orby_ia",
+        "key_path": "/home/bruno/.ssh/id_ed25519_orby_ia",
+        "ssh_host": "github.com-orby-ia",
+        "git_remote": "git@github.com:agestrategia360-sudo/Orby.ia.git",
+        "github_repo": "https://github.com/agestrategia360-sudo/Orby.ia"
+      },
+      "env_file": "/home/bruno/.envs/orby_ia.env",
+      "status": "active"
+    },
+    {
+      "id": "cofre",
+      "name": "Cofre",
+      "path": "/home/bruno/Cofre",
+      "ssh": {
+        "key_file": "id_ed25519_cofre",
+        "key_path": "/home/bruno/.ssh/id_ed25519_cofre",
+        "ssh_host": "github.com-cofre",
+        "git_remote": "git@github.com-cofre:agestrategia360-sudo/Cofre.git",
+        "github_repo": "https://github.com/agestrategia360-sudo/Cofre"
+      },
+      "env_file": "/home/bruno/.envs/cofre.env",
+      "status": "active"
+    },
+    {
+      "id": "monitor-admin",
+      "name": "Monitor-Admin",
+      "path": "/home/bruno/Monitor-Admin",
+      "ssh": {
+        "key_file": "id_ed25519_monitor_admin",
+        "key_path": "/home/bruno/.ssh/id_ed25519_monitor_admin",
+        "ssh_host": "github.com-monitor-admin",
+        "git_remote": "git@github.com:agestrategia360-sudo/Monitor-Admin.git",
+        "github_repo": "https://github.com/agestrategia360-sudo/Monitor-Admin"
+      },
+      "env_file": "/home/bruno/.envs/monitor_admin.env",
+      "status": "active"
+    },
+    {
+      "id": "novo-site-ugarit",
+      "name": "Novo Site Ugarit",
+      "path": "/home/bruno/novo-site-ugarit",
+      "ssh": {
+        "key_file": "id_ed25519_novo_site_ugarit",
+        "key_path": "/home/bruno/.ssh/id_ed25519_novo_site_ugarit",
+        "ssh_host": "github.com-novo-site-ugarit",
+        "git_remote": "git@github.com-novo-site-ugarit:agestrategia360-sudo/novo-site-ugarit.git",
+        "github_repo": "https://github.com/agestrategia360-sudo/novo-site-ugarit"
+      },
+      "env_file": "/home/bruno/.envs/novo_site_ugarit.env",
+      "status": "active"
+    }
+  ],
+  "ssh_config_template": {
+    "description": "Modelo de entrada SSH config",
+    "example": {
+      "host": "github-xxxx",
+      "hostname": "github.com",
+      "user": "git",
+      "identityfile": "~/.ssh/id_ed25519_xxxx",
+      "identitiesonly": true
+    }
+  },
+  "rules": {
+    "never_share_keys": true,
+    "one_key_per_project": true,
+    "envs_isolated": true,
+    "no_hardcoded_credentials": true
+  },
+  "last_updated": "2026-08-25",
+  "updated_by": "Kothar v3.0"
+}

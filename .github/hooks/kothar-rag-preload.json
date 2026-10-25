@@ -1,0 +1,11 @@
+{
+  "kothar-rag-preload": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "ROOT=\"${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}\"; PYTHON=\"${KOTHAR_PYTHON:-/home/bruno-harkin/kothar/.venv/bin/python}\"; KOTHAR_PROJECT_DIR=\"$ROOT\" \"$PYTHON\" /home/bruno-harkin/kothar/hooks/agy-rag-preload.py",
+        "timeout": 15
+      }
+    ]
+  }
+}

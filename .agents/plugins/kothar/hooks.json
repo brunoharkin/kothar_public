@@ -1,0 +1,71 @@
+{
+  "kothar-session-init": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "python3 /home/bruno-harkin/kothar/hooks/agy-session-init.py",
+        "timeout": 10
+      }
+    ]
+  },
+  "kothar-rag-preload": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "python3 /home/bruno-harkin/kothar/hooks/agy-rag-preload.py",
+        "timeout": 15
+      }
+    ]
+  },
+  "kothar-credential-scanner": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /home/bruno-harkin/kothar/hooks/agy-credential-scanner.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "kothar-post-codegen-validate": {
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/bruno-harkin/kothar/hooks/post-codegen-validate.sh",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
+  "kothar-structure-audit": {
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/bruno-harkin/kothar/hooks/kothar-structure-audit.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "kothar-session-end": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "bash /home/bruno-harkin/kothar/hooks/post-session-learner.sh",
+        "timeout": 30
+      }
+    ]
+  }
+}

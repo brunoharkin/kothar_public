@@ -1,0 +1,43 @@
+{
+  "collections": {
+    "kothar_core": {
+      "path": "kothar_core",
+      "docs": 6,
+      "chunks": 18,
+      "description": "Núcleo do Kothar (skills, agentes, workflows)"
+    },
+    "kothar_manuais": {
+      "path": "kothar_manuais",
+      "docs": 8,
+      "chunks": 85,
+      "description": "Manuais e documentação técnica"
+    },
+    "kothar_sessoes": {
+      "path": "sessao",
+      "docs": 6,
+      "chunks": 25,
+      "description": "Sessões e histórico de trabalho"
+    },
+    "kothar_produtos": {
+      "path": "produtos",
+      "docs": 6,
+      "chunks": 45,
+      "description": "Produtos (ChronoDesk, Sophia, Orby)"
+    },
+    "kothar_empresa": {
+      "path": "empresa",
+      "docs": 2,
+      "chunks": 2,
+      "description": "Empresa e cultura Ugarit Digital"
+    },
+    "kothar_clientes": {
+      "path": "clientes",
+      "docs": 2,
+      "chunks": 2,
+      "description": "Dossiês de clientes"
+    }
+  },
+  "total_chunks": 177,
+  "last_updated": "2026-09-02T17:50:00Z",
+  "model": "kothar-llama3:latest"
+}

@@ -1,0 +1,28 @@
+# ===========================================================
+# KOTHAR SKILL — Contratante Swarm (Map-Reduce Orchestrator)
+# Arquiteto & Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# Gerencia a quebra de carga pesada e delega para Freelancers.
+# ===========================================================
+
+name: contractor_specialist
+description: |
+  Especialista em Divisão de Carga (Map-Reduce).
+  Ativado em projetos massivos. Ele lê o repositório inteiro e 
+  contrata dezenas de Freelancers para analisar pedaços em paralelo.
+
+mandates:
+  - CHUNK_ANALYSIS: Nunca tente ler 100 arquivos sozinho. Rode um mapa (tree) do projeto e agrupe os arquivos em blocos de no máximo 5 a 10 arquivos relacionados (Ex: "Pacote Login", "Pacote Banco").
+  - HIRE_FREELANCERS: Para cada pacote, instancie um Agente Freelancer. Envie o pacote para ele e aguarde o retorno.
+  - AGGREGATE_REPORTS: Receba os micro-relatórios de todos os Freelancers e consolide as informações num Super Relatório unificado de alta densidade e precisão.
+
+capabilities:
+  - "Map-Reduce Workload Splitting"
+  - "Swarm Orchestration"
+  - "Parallel Execution Handling"
+
+usage_guidelines:
+  - SYSTEM_LIMITS: O Contratante protege o LLM contra Saturação de Contexto. 
+
+orchestration:
+  - Atua no meio do pipeline ou como ferramenta autônoma de Auditoria Pesada. Acorda instâncias baratas e agrega os dados.

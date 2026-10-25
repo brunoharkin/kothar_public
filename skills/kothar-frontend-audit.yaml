@@ -1,0 +1,146 @@
+# KOTHAR SKILL: Auditoria de Frontend
+name: kothar-frontend-audit
+description: Auditoria específica para trabalho em frontend - verificação obrigatória
+
+# ============================================================
+# SKILL: AUDITORIA DE FRONTEND KOTHAR v4.0
+# ============================================================
+# Este skill deve ser usado em TODA alteração de frontend
+# ============================================================
+
+## Quando Usar
+- Ao modificar arquivos `.tsx`, `.ts`, `.jsx`, `.js`
+- Ao adicionar dependências
+- Ao modificar componentes
+- Antes de commits em frontend
+
+## Checklist de Auditoria de Frontend
+
+### 1. SEGURANÇA
+```
+[ ] Nenhuma credencial no código
+[ ] Nenhum token em localStorage
+[ ] Nenhum IP/porta exposto
+[ ] Sem console.log com dados sensíveis
+[ ] API calls vão para o backend
+```
+
+### 2. COMPILAÇÃO
+```
+[ ] npm run dev funciona
+[ ] npm run build funciona
+[ ] TypeScript sem erros (npx tsc --noEmit)
+[ ] Lint sem erros (npm run lint)
+```
+
+### 3. CONSOLE DO NAVEGADOR
+```
+[ ] Zero erros (ERROR)
+[ ] Zero warnings de segurança
+[ ] WebSocket conectado
+[ ] API respondendo
+```
+
+### 4. FUNCIONALIDADES
+```
+[ ] Login funciona
+[ ] Navegação funciona
+[ ] Dados carregam
+[ ] Formulários validam
+[ ] Funcionalidades relacionadas funcionam
+[ ] Nada existente quebrou
+```
+
+### 5. IMPORTS
+```
+[ ] Todos os imports existem
+[ ] Nenhum import quebrado
+[ ] Componentes referenciados existem
+[ ] Caminhos corretos
+```
+
+## Ferramentas de Teste
+
+```bash
+# Validar frontend completo
+/home/bruno/kothar/scripts/kothar_frontend_validator.sh
+
+# Apenas TypeScript
+cd /home/bruno/Orby.ia/frontend
+npx tsc --noEmit
+
+# Apenas Lint
+npm run lint
+
+# Apenas Build
+npm run build
+```
+
+## Regras de Ouro para Frontend
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║  FRONTEND = EXIBIR, BACKEND = GERENCIAR                     ║
+║                                                                ║
+║  ❌ NUNCA:                                                   ║
+║     • Esconder tokens em variáveis                            ║
+║     • Salvar credenciais                                      ║
+║     • Conectar direto em bancos                               ║
+║     • Expor portas internas                                   ║
+║                                                                ║
+║  ✅ SEMPRE:                                                  ║
+║     • Buscar dados da API                                    ║
+║     • Enviar dados para backend processar                     ║
+║     • Exibir, não guardar                                    ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
+## Fluxo de Trabalho em Frontend
+
+```
+1. Receber tarefa
+   ↓
+2. Consultar RAG por código similar
+   ↓
+3. Criar plano (salvar no cofre)
+   ↓
+4. Modificar código (UMA coisa por vez)
+   ↓
+5. Testar (npm run dev + console)
+   ↓
+6. Se OK → próxima mudança
+   ↓
+7. Se ERRO → corrigir e testar novamente
+   ↓
+8. Auditoria final de segurança
+   ↓
+9. Commit
+```
+
+## Erros Comuns a Evitar
+
+| Erro | Solução |
+|------|---------|
+| Import quebrado | Verificar se arquivo existe |
+| localStorage com token | Backend deve gerenciar |
+| Credencial no código | Buscar do backend |
+| Console com password | Remover logging |
+| IP hardcoded | Usar variáveis de ambiente |
+
+## Exemplo de Boa Prática
+
+```typescript
+// ❌ ERRADO
+const token = localStorage.getItem('token');
+api.post('/data', { token, password: '123' });
+
+// ✅ CORRETO
+const response = await api.post('/login', { email, password });
+// Backend retorna token, frontend apenas exibe
+```
+
+---
+
+**Skill parte do sistema Kothar v4.0**
+**Versão: 2.0**
+**Data: 2026-09-10**

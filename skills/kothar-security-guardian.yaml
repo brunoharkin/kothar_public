@@ -1,0 +1,320 @@
+# KOTHAR SKILL: Security Guardian
+name: kothar-security-guardian
+description: Guarda de segurança intrínseca - O agente DEVE ver problemas de segurança automaticamente ao escrever código
+
+# ============================================================
+# SKILL: SECURITY GUARDIAN - KOTHAR v4.0
+# ============================================================
+#
+# ESTE SKILL DEVE SER ATIVADO EM TODO CÓDIGO ESCRITO
+# O AGENTE DEVE "ENXERGAR" PROBLEMAS AUTOMATICAMENTE
+#
+# ============================================================
+
+## 🎯 PRINCÍPIO FUNDAMENTAL
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   SEGURANÇA NÃO É UMA ETAPA - É PARTE DO CÓDIGO                         ║
+║                                                                           ║
+║   O agente deve PARAR quando ver:                                        ║
+║   → Credenciais no código                                                ║
+║   → Tokens no localStorage                                               ║
+║   → Logs com dados sensíveis                                             ║
+║   → Input não validado                                                   ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## 🔴 REGRAS CRÍTICAS (PARAR SE VIOLAR)
+
+### REGRA 1: CREDENCIAIS NO CÓDIGO = CRÍTICO
+
+```
+❌ NUNCA ESCREVER:
+   const apiKey = "sk-xxxx-xxxx";
+   const token = "ghp_xxxx";
+   const password = "minha-senha";
+
+✅ SEMPRE FAZER:
+   # Backend
+   import os
+   api_key = os.getenv('API_KEY')
+
+   # Frontend (via API, não diretamente)
+   const data = await api.get('/credentials');
+```
+
+### REGRA 2: TOKEN NO localStorage = CRÍTICO
+
+```
+❌ NUNCA ESCREVER:
+   localStorage.setItem('token', response.token);
+   localStorage.setItem('apiKey', key);
+   sessionStorage.setItem('token', token);
+
+✅ SEMPRE FAZER:
+   # Backend define cookie HttpOnly
+   # Frontend usa credentials: 'include'
+   const response = await fetch('/api/login', {
+     credentials: 'include'
+   });
+```
+
+### REGRA 3: LOG DE DADOS SENSÍVEIS = CRÍTICO
+
+```
+❌ NUNCA ESCREVER:
+   console.log('Token:', token);
+   logger.info('Password:', password);
+   print(f'Secret: {secret}');
+
+✅ SEMPRE FAZER:
+   console.log('Login successful');
+   logger.info('User logged in', { userId });
+```
+
+---
+
+## 🟠 REGRAS DE PROJETO
+
+### PARA FRONTEND
+
+```
+VALIDAÇÕES MENTAIS AO ESCREVER FRONTEND:
+═══════════════════════════════════════════
+
+PERGUNTA 1: Este código vai processar CREDENCIAL?
+   → Sim? → MUDAR para chamada API
+   → Não? → Continuar
+
+PERGUNTA 2: Este código vai guardar TOKEN?
+   → Sim? → MUDAR para cookie HttpOnly
+   → Não? → Continuar
+
+PERGUNTA 3: Este código vai expor IP interno?
+   → Sim? → USAR variável de ambiente
+   → Não? → Continuar
+
+PADRÕES FRONTEND:
+✅ PODE: Exibir dados da API
+✅ PODE: Coletar input do usuário
+✅ PODE: Enviar para backend processar
+❌ NÃO PODE: Guardar tokens
+❌ NÃO PODE: Guardar API keys
+❌ NÃO PODE: Conectar direto em bancos
+```
+
+### PARA BACKEND
+
+```
+VALIDAÇÕES MENTAIS AO ESCREVER BACKEND:
+═══════════════════════════════════════════
+
+PERGUNTA 1: Preciso de CREDENCIAL?
+   → Sim? → USAR os.getenv('NOME')
+   → Não? → Continuar
+
+PERGUNTA 2: Input do usuário está sendo usado?
+   → Sim? → VALIDAR com pydantic/marshmallow
+   → Não? → Continuar
+
+PERGUNTA 3: Estou fazendo LOG?
+   → Sim? → VERIFICAR: senha? token? key?
+   → Não? → Continuar
+
+PADRÕES BACKEND:
+✅ DEVE: Variáveis de ambiente para credenciais
+✅ DEVE: Validar TODO input
+✅ DEVE: Cookies HttpOnly para tokens
+✅ DEVE: Logging seguro
+❌ NÃO DEVE: Credenciais no código
+❌ NÃO DEVE: Logs com dados sensíveis
+```
+
+---
+
+## 🔍 COMO ENXERGAR PROBLEMAS
+
+### Padrões para DETECTAR Automaticamente
+
+```
+DETECÇÃO AUTOMÁTICA:
+═══════════════════════════
+
+CREDENCIAIS:
+   sk-xxxx → PARAR - API key exposta
+   ghp_xxxx → PARAR - GitHub token exposto
+   AKIAxxxx → PARAR - AWS key exposta
+   "password": "xxxx" → PARAR - Password hardcoded
+
+STORAGE:
+   localStorage.setItem('token' → PARAR - Token exposto
+   localStorage.setItem('key' → PARAR - Key exposta
+
+LOGS:
+   console.log(...token) → PARAR - Log de token
+   console.log(...password) → PARAR - Log de senha
+   logger.info(...secret → PARAR - Log de secret
+
+SQL:
+   f"SELECT * FROM {table}" → PARAR - SQL Injection
+   .format() em SQL → PARAR - SQL Injection
+
+XSS:
+   dangerouslySetInnerHTML → PARAR - XSS
+   innerHTML = → PARAR - XSS
+```
+
+---
+
+## ✅ CORREÇÕES AUTOMÁTICAS
+
+### Credencial Hardcoded → Variável de Ambiente
+
+```typescript
+// ❌ ANTES
+const apiKey = "sk-xxxx-xxxx";
+
+// ✅ DEPOIS
+// Backend: import os → os.getenv('API_KEY')
+// Frontend: via API → const { key } = await api.get('/credentials')
+```
+
+### Token localStorage → HttpOnly Cookie
+
+```typescript
+// ❌ ANTES
+localStorage.setItem('token', response.token);
+
+// ✅ DEPOIS
+// Backend define: response.set_cookie('token', value, httponly=True)
+// Frontend: credentials: 'include' na fetch
+```
+
+### Log Sensível → Log Seguro
+
+```typescript
+// ❌ ANTES
+console.log('Token:', token);
+
+// ✅ DEPOIS
+console.log('Authenticated successfully');
+```
+
+---
+
+## 📋 CHECKLIST DE AUTOVERIFICAÇÃO
+
+### Antes de Salvar (OBRIGATÓRIO)
+
+```
+VERIFICAÇÃO RÁPIDA:
+════════════════════════
+
+[ ] 1. Credenciais no código?
+    → Ctrl+F: "sk-" | "ghp_" | "password" | "secret"
+    → Se encontrar: REMOVER
+
+[ ] 2. Tokens no localStorage?
+    → Ctrl+F: "localStorage.setItem"
+    → Se encontrar: MUDAR para HttpOnly cookie
+
+[ ] 3. Logs com dados sensíveis?
+    → Ctrl+F: console.log | logger.info
+    → Se encontrar: REMOVER dados sensíveis
+
+[ ] 4. Input validado?
+    → Verificar: pydantic validation, schema validation
+    → Se não: ADICIONAR validação
+
+[ ] 5. SQL seguro?
+    → Ctrl+F: f" | .format( | + "
+    → Se encontrar: MUDAR para prepared statements
+
+[ ] 6. .env com valores reais?
+    → Verificar: .gitignore inclui .env
+    → Se não: ADICIONAR ao .gitignore
+```
+
+---
+
+## 🚨 QUANDO PARAR E CORRIGIR
+
+### LISTA DE PARAR/CORRIGIR
+
+| Situação | Ação |
+|----------|------|
+| API key no código | PARA → Usa `os.getenv` |
+| Token no localStorage | PARA → Usa HttpOnly cookie |
+| Password no log | PARA → Remove do log |
+| Input sem validação | PARA → Adiciona validação |
+| SQL com interpolação | PARA → Usa prepared statement |
+| .env no git | PARA → Remove do staging |
+| IP hardcoded | PARA → Usa variável de ambiente |
+| Secret no código | PARA → Usa variável de ambiente |
+
+---
+
+## 📚 REFERÊNCIA RÁPIDA
+
+### Frontend Seguro
+
+```
+FRONTEND ✅:
+   - Exibir dados da API
+   - Coletar input do usuário
+   - Enviar para backend processar
+   - Validações visuais (formato, obrigatoriedade)
+
+FRONTEND ❌:
+   - Guardar tokens
+   - Guardar API keys
+   - Guardar senhas
+   - Conectar direto em bancos
+   - Expor IPs internos
+```
+
+### Backend Seguro
+
+```
+BACKEND ✅:
+   - Variáveis de ambiente para credenciais
+   - Cookies HttpOnly para tokens
+   - Validação de TODO input
+   - Prepared statements para SQL
+   - Logging de ações (não dados)
+
+BACKEND ❌:
+   - Credenciais no código
+   - Logs com passwords/tokens/keys
+   - Input não validado
+   - SQL com interpolação direta
+```
+
+---
+
+## 🎯 EXECUÇÃO
+
+### Para ativar este skill:
+
+```
+/kothar security-guardian
+```
+
+### Este skill deve ser invocado:
+
+1. **Antes de escrever código**
+2. **Após escrever código**
+3. **Antes de commits**
+4. **Ao detectar problemas de segurança**
+
+---
+
+**Security Guardian - Kothar v4.0**
+**Versão: 1.0**
+**Data: 2026-09-10**
+**Status: ATIVADO E OBRIGATÓRIO**

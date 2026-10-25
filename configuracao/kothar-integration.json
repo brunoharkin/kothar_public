@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "name": "Kothar",
+  "canonical": {
+    "skills": ".agents/skills",
+    "instructions": "AGENTS.md",
+    "agents": ".github/agents",
+    "agentRegistry": "configuracao/kothar-agent-registry.json",
+    "transitions": "configuracao/kothar-transitions.json",
+    "contracts": "backend/contracts/execution.py",
+    "hooks": ".github/hooks",
+    "mcp": ".vscode/mcp.json"
+  },
+  "targets": {
+    "vscode-copilot": {
+      "agents": ".github/agents",
+      "hooks": ".github/hooks",
+      "agentRegistry": "configuracao/kothar-agent-registry.json",
+      "mcp": ".vscode/mcp.json",
+      "support": "full"
+    },
+    "claude-code": {
+      "instructions": "CLAUDE.md",
+      "agent": ".claude/agents/kothar.md",
+      "skills": ".agents/skills",
+      "support": "instructions-and-skills"
+    },
+    "gemini-cli": {
+      "instructions": "GEMINI.md",
+      "mcp": "configuracao/mcp.json",
+      "support": "instructions-and-mcp"
+    },
+    "antigravity": {
+      "instructions": "GEMINI.md",
+      "agent": ".agents/agents/kothar.json",
+      "skills": ".agents/skills",
+      "agentRegistry": "configuracao/kothar-agent-registry.json",
+      "support": "orchestrator-and-registry"
+    },
+    "codex": {
+      "instructions": "AGENTS.md",
+      "skills": ".agents/skills",
+      "support": "instructions-and-skills"
+    }
+  },
+  "credentials": {
+    "provider": "environment-only",
+    "huggingface": "HF_TOKEN",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "google": "GEMINI_API_KEY",
+    "openai": "OPENAI_API_KEY"
+  }
+}

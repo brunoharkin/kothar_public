@@ -1,0 +1,20 @@
+{
+  "claude-cli": {
+    "snapshot": {
+      "id": "claude-cli",
+      "name": "Claude Code",
+      "fidelity": "official",
+      "status": "ok",
+      "windows": [],
+      "headline": null,
+      "context": {
+        "timestamp": "2026-09-16T14:04:31.907968",
+        "instance": "claude-cli",
+        "model": ""
+      },
+      "ledger_today": null,
+      "error_message": null
+    },
+    "saved_at": "2026-09-16T14:04:31.908150"
+  }
+}

@@ -1,0 +1,111 @@
+# ===========================================================
+# KOTHAR SKILL — Mandato de Auto-Verificação (OBRIGATÓRIO)
+# Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# Esta skill é CRÍTICA e deve ser invocada em TODA entrega.
+# Garante que nenhuma correção seja entregue sem teste real.
+# ===========================================================
+
+name: mandatory_self_verification
+description: |
+  Mandato OBRIGATÓRIO: Antes de entregar QUALQUER correção/modificação,
+  o agente deve testar ao vivo que ela realmente funciona.
+  Nunca entregue código sem verificar.
+
+mandates:
+  - NEVER_DELIVER_UNVERIFIED: Proibido entregar correção sem testar ao vivo.
+  - LIVE_TEST_REQUIRED: Toda correção de frontend DEVE ser testada no browser.
+  - API_TEST_REQUIRED: Toda correção de backend DEVE ser testada via curl/HTTP.
+  - TRACE_VALIDATION: Toda correção no fluxo RAG DEVE ser testada com query real.
+  - EVIDENCE_REQUIRED: Mostrar logs/prints do teste bem-sucedido antes de declarar pronto.
+
+capabilities:
+  - "Live API Testing (curl + response validation)"
+  - "Browser-based Frontend Testing (Playwright/Puppeteer)"
+  - "Database State Validation (queries reais)"
+  - "End-to-End Integration Testing"
+
+verification_protocol:
+  backend_changes:
+    1. Iniciar API se não estiver rodando
+    2. Executar curl no endpoint afetado
+    3. Validar response JSON esperado
+    4. Verificar status code correto
+    5. Confirmar mudança no banco/storage
+    6. Logs: "✅ TEST PASSED: {endpoint} returned {expected}"
+
+  frontend_changes:
+    1. Verificar se API está rodando
+    2. Iniciar dev server se necessário
+    3. Abrir browser real (Playwright/Puppeteer)
+    4. Navegar até a página alterada
+    5. Verificar visualmente que dados aparecem
+    6. Capturar screenshot
+    7. Confirmar que não há erros no console
+    8. Logs: "✅ FRONTEND TEST PASSED: {page} mostra {data}"
+
+  rag_changes:
+    1. Executar query de teste via API
+    2. Validar que ChromaDB retorna resultados
+    3. Verificar que Neo4j registra nodos/arestas
+    4. Confirmar que Redis cache funciona
+    5. Logs: "✅ RAG TEST PASSED: {query} retornou {n} chunks"
+
+  agent_changes:
+    1. Criar sessão via /api/orchestrate/start
+    2. Verificar que trace é gravado no PostgreSQL
+    3. Confirmar que vault report é gerado
+    4. Validar métricas em /metrics
+    5. Logs: "✅ AGENT TEST PASSED: {session_id} completou {n} steps"
+
+usage_guidelines:
+  - ALWAYS_RUN: Antes de cada entrega, executar testes ao vivo
+  - NEVER_DECLARE_DONE: Sem evidência de teste, não declarar "pronto"
+  - FAIL_FAST: Se teste falhar, parar imediatamente e reportar
+  - DOCUMENT_TEST: Sempre incluir logs de teste na entrega
+
+response_template:
+  success: |
+    ✅ VERIFIED
+    - Endpoint: {url}
+    - Test executed: {command}
+    - Response: {expected_field} = {actual_value}
+    - Status: {status_code}
+    - Database state: {db_changes}
+
+  failure: |
+    ❌ FAILED
+    - Endpoint: {url}
+    - Expected: {expected}
+    - Got: {actual}
+    - Reason: {reason}
+    - Action: {next_step}
+
+integration_checklist:
+  api_running:
+    - curl http://localhost:8080/health returns 200
+    - curl http://localhost:8080/metrics/json returns valid JSON
+    - curl http://localhost:8080/health/detailed shows all components
+
+  dashboard_working:
+    - GET /api/dashboard returns full metrics
+    - GET /api/dashboard/sessions/recent returns array
+    - GET /api/dashboard/traces/timeline returns timeline data
+
+  frontend_working:
+    - React component fetches /api/dashboard
+    - Component renders metrics correctly
+    - No 404 or 500 errors in network tab
+    - Component re-fetches every 5-10 seconds
+
+  end_to_end:
+    - Start API: bash scripts/kothar_full_start.sh
+    - Start frontend: cd tracing/frontend && npm run dev
+    - Open browser: http://localhost:5180
+    - Verify metrics page shows real data
+
+orchestration:
+  - Este mandato é ACIMA de qualquer outro skill
+  - Falha em verificação = Bloqueio de entrega
+  - Usar em conjunto com: code_reviewer, qa_agent
+  - NUNCA substituir pela opinião do agente ("deve funcionar")

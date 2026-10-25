@@ -1,0 +1,9 @@
+{
+  "mcp_servers": {
+    "kothar": {
+      "command": "bash",
+      "args": ["-c", "echo Kothar MCP Server - Maestro v3.0"],
+      "description": "Kothar Maestro - Orquestração Digital"
+    }
+  }
+}

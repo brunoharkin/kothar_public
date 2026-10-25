@@ -1,0 +1,49 @@
+# ===========================================================
+# KOTHAR SKILL — Especialista Frontend (ThreeUI & WebGL)
+# Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# Skill que ensina o Maestro Kothar e seus Especialistas
+# como gerar Interfaces Web Ultra-Premium usando WebGL 3D,
+# React Three Fiber e shaders complexos através da 
+# biblioteca nativa ThreeUI (@designcodeio/threeui).
+# ===========================================================
+
+name: frontend_threeui_specialist
+description: |
+  Especialista avançado em Frontend. Deve ser invocado sempre que o usuário 
+  solicitar uma "Interface Premium", "Animação 3D", "Botões Dinâmicos", 
+  "Glassmorphism" ou "Efeitos Especiais WebGL".
+
+mandates:
+  - DO NOT CREATE GENERIC UIs. Quando acionado para interfaces premium, evite botões CSS planos genéricos.
+  - USE THREEUI. Utilize a biblioteca @designcodeio/threeui para injetar shaders e componentes React de alto nível.
+  - SHADER INTEGRITY. Ao extrair ou construir um componente baseado no repositório ThreeUI, JAMAIS altere os Shaders (GLSL), Buffers ou o Framebuffer graph. O WebGL2 falhará se tentar "aproximar" o código.
+
+capabilities:
+  - "React Component Libraries"
+  - "WebGL2 / Three.js Shaders"
+  - "Immersive UI/UX Orchestration"
+
+usage_guidelines:
+  - Quando desenvolver para o ChronoDesk ou CRM Sophia (React/Vite):
+    1. Instale o pacote oficial via npm: `npm install @designcodeio/threeui`
+    2. Importe o estilo base no app: `import "@designcodeio/threeui/style.css";`
+    3. Importe os componentes diretamente: `import { LiquidMetalButton, EnergyOrb } from "@designcodeio/threeui";`
+  
+  - Quando a customização extrema do shader for necessária:
+    - O agente deve consultar o repositório raw do ThreeUI (ex: /home/bruno/kothar/scratch/threeui/src/shaders/)
+    - O agente deve COPIAR EXATAMENTE os arquivos `.html` (que contém os shaders bit a bit) e o invólucro `.tsx`.
+    - Não traduza os shaders para React puro sem iframe se o autor original usou a técnica de iframe srcDoc para isolamento de contexto WebGL.
+
+components_reference:
+  - liquid-metal-button: "Botão de metal líquido prismático. Excelente para CTAs (Call to Actions) principais."
+  - energy-orb: "Esfera de energia pulsante. Ótimo para dashboards futuristas (Orby.IA)."
+  - emerald-horizon: "Paisagem de fundo WebGL. Ótimo para a Landing Page do ChronoDesk."
+  - portal-field: "Campo de portal animado para transições ou logins."
+
+orchestration:
+  - Se o usuário pedir: "Crie uma Landing Page para o nosso novo sistema que dê impacto visual":
+    O Maestro deve alocar o Engineer para criar uma página em React que importe o `emerald-horizon` ou `warp-field` como Hero Section, e utilize o `liquid-metal-button` como botão de conversão.
+
+  - Se o usuário pedir: "Melhore o visual do dashboard":
+    O Maestro deve utilizar as `circle-buttons` dinâmicas e o `energy-orb` para indicadores de status.

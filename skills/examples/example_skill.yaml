@@ -1,0 +1,83 @@
+# ===========================================================
+# KOTHAR SKILL — Exemplo de Template
+# Engenheiro Kothar | Ugarit Digital
+# ===========================================================
+# Toda skill cristalizada pelo Maestro segue este formato.
+# Salvar em: skills/<categoria>/<nome-da-skill>.yaml
+# ===========================================================
+
+metadata:
+  name: "exemplo_skill_react_component"
+  version: "1.0.0"
+  category: "frontend"
+  tags:
+    - react
+    - typescript
+    - component
+  description: "Como criar um componente React tipado e reutilizável"
+  forged_by: "maestro"
+  forged_at: "2026-08-30"
+  success_rate: 100.0
+  usage_count: 0
+
+context:
+  when_to_use: |
+    Use esta skill quando o Engenheiro precisar criar um novo componente React.
+    Aplica-se a componentes funcionais com TypeScript e props tipadas.
+
+  preconditions:
+    - "Projeto Vite/React configurado"
+    - "TypeScript habilitado"
+
+  constraints:
+    - "Nunca use 'any' como tipo"
+    - "Sempre defina interface de Props separada"
+    - "Componente deve ser exportado como named export e default"
+
+blueprint:
+  steps:
+    - id: 1
+      action: "Definir interface de Props"
+      template: |
+        interface ${ComponentName}Props {
+          // props aqui
+        }
+
+    - id: 2
+      action: "Criar componente funcional tipado"
+      template: |
+        export function ${ComponentName}({ prop1, prop2 }: ${ComponentName}Props) {
+          return (
+            <div>
+              {/* conteúdo */}
+            </div>
+          );
+        }
+
+    - id: 3
+      action: "Exportar como default"
+      template: |
+        export default ${ComponentName};
+
+examples:
+  - description: "Componente de botão"
+    code: |
+      interface ButtonProps {
+        label: string;
+        onClick: () => void;
+        variant?: 'primary' | 'secondary';
+      }
+
+      export function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
+        return (
+          <button className={`btn btn-${variant}`} onClick={onClick}>
+            {label}
+          </button>
+        );
+      }
+
+      export default Button;
+
+locks:
+  - "Nunca use React.FC — causa problemas com generics"
+  - "Não use defaultProps — use default parameters nas props"

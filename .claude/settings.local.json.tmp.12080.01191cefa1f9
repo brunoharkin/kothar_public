@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod 600 ~/.ssh/config)",
+      "Bash(ssh-add ~/.ssh/id_ed25519_kothar)",
+      "Bash(ssh -T github-kothar)",
+      "Bash(ssh-keyscan github.com)",
+      "Bash(chmod 644 ~/.ssh/known_hosts)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git config *)",
+      "Bash(git branch *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git restore *)",
+      "Bash(git add *)"
+    ]
+  }
+}

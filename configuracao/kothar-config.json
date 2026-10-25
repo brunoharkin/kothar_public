@@ -1,0 +1,17 @@
+{
+  "versao": "4.0.0",
+  "operador": {
+    "nome": "Bruno Harkin",
+    "empresa": "Ugarit Digital",
+    "cargo": "Head de Engenharia e Criador"
+  },
+  "caminhos": {
+    "kothar_dir": "/home/bruno-harkin/kothar",
+    "vault_dir": "/home/bruno-harkin/Cofre",
+    "chroma_dir": "/home/bruno-harkin/kothar/.chroma-data"
+  },
+  "rag": {
+    "ativo": true,
+    "modo": "persistente_local"
+  }
+}

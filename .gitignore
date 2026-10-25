@@ -1,0 +1,107 @@
+# ==========================================
+# KOTHAR .gitignore
+# ==========================================
+
+# Credenciais e variáveis de ambiente
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+credentials.json
+token.json
+client_secret*.json
+.google-tokens/
+.linkedin-tokens/
+.meta-tokens/
+
+# Proibido criar Cofre dentro do Kothar (o Cofre único fica em ~/Cofre)
+Cofre/
+cofre/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+
+# Logs
+logs/
+*.log
+hook.log
+errors.log
+structure-audit.log
+*.sessions
+
+# Dados ChromaDB
+chromadb/*.sqlite3
+chromadb/*/data_*.bin
+chromadb/*/header.bin
+chromadb/*/length.bin
+chromadb/*/link_lists.bin
+.chroma-data/
+.rag-index-state.json
+.cofre_rw/
+.runtime/
+.kothar-rag.pid
+.kothar-rag.log
+
+# Backups locais
+backups/
+*.tar.gz
+*.backup
+.kothar/backups/
+
+# Node
+node_modules/
+.npm
+.yarn
+
+# Docker
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/sessions/
+.claude/projects/*/memory/*.jsonl
+.claude/projects/*/*.jsonl
+.claude/projects/-home-bruno-kothar/memory/*.md
+
+# Ugarit specific
+cofre/
+.disparo-em-massa/
+.crm-saphia/
+.orby-ia/
+
+# Arquivos de estado Kothar
+.recording
+.tracer-state.json
+.tracer-pid
+.observer-pid
+.recording-started
+
+# Watchdog status (dinâmico)
+watchdog_status.json
+
+# Chaves e credenciais de deploy local
+.ssh_deploy/
+*.pub
+
